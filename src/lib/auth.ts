@@ -1,6 +1,6 @@
-import { cache } from "react";
-import { redirect } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export const getSession = cache(async (): Promise<Session | null> => {

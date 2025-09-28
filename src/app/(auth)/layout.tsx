@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import BottomNavigation from "@/common/BottomNavigation";
 import Header from "@/common/Header";
 import { requireUser } from "@/lib/auth";

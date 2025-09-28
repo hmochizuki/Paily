@@ -10,6 +10,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export function createSupabaseBrowserClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error("Supabase public env vars are not set");
+  }
   return createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
