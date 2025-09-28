@@ -15,6 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "This is a title",
   description: "This is a description",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico" },
+    ],
+    apple: {
+      url: "/favicon.svg",
+    },
+  },
 };
 
 export default function RootLayout({

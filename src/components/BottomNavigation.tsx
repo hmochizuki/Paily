@@ -106,7 +106,7 @@ export default function BottomNavigation({ activeIndex = 0 }: BottomNavigationPr
             key={item.label}
             type="button"
             className={`flex flex-col items-center justify-center py-2 transition-colors ${
-              index === activeIndex ? "text-[var(--color-brand)]" : "text-gray-600"
+              index === activeIndex ? "text-[var(--color-brand-hover)]" : "text-gray-600"
             }`}
           >
             {item.icon}
