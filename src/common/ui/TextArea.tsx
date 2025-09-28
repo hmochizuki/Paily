@@ -34,7 +34,7 @@ export default function TextArea({
           rounded-lg
           bg-[var(--color-bg-elevated)]
           text-[var(--color-text-default)]
-          placeholder:text-[var(--color-text-muted)]
+          placeholder:text-[var(--color-text-muted)] placeholder:opacity-50
           outline-none
           focus:border-[var(--color-brand)]
           focus:ring-2 focus:ring-[var(--color-brand)] focus:ring-opacity-20
