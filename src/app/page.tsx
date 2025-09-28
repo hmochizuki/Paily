@@ -1,5 +1,6 @@
 import Form from "next/form";
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
+import TextField from "@/components/ui/TextField";
 import { prisma } from "@/lib/prisma";
 
 export default function Home() {
@@ -28,45 +29,26 @@ export default function Home() {
   return (
     <div className="px-4 py-6">
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-2xl font-semibold text-[var(--color-text-default)] mb-2">
           ようこそ
         </h2>
-        <p className="text-gray-600">新規ユーザー登録をしてください</p>
+        <p className="text-[var(--color-text-muted)]">新規ユーザー登録をしてください</p>
       </div>
 
       <Form action={createUser} className="space-y-5">
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            名前
-          </label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            required
-            className="text-black w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] focus:border-transparent text-base"
-            placeholder="山田 太郎"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            メールアドレス
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            required
-            className="text-black w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] focus:border-transparent text-base"
-            placeholder="example@mail.com"
-          />
-        </div>
+        <TextField
+          name="name"
+          label="名前"
+          placeholder="山田 太郎"
+          required
+        />
+        <TextField
+          name="email"
+          type="email"
+          label="メールアドレス"
+          placeholder="example@mail.com"
+          required
+        />
         <Button type="submit" fullWidth size="lg">
           ユーザーを作成
         </Button>
