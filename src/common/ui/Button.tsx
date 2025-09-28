@@ -18,7 +18,7 @@ export default function Button({
   const baseClasses = `
     inline-flex items-center justify-center
     font-medium rounded-lg
-    transition-colors duration-200
+    transition-all duration-200
     focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-2
     disabled:opacity-50 disabled:cursor-not-allowed
   `;
@@ -27,15 +27,18 @@ export default function Button({
     primary: `
       bg-[var(--color-brand)] text-[var(--color-brand-contrast)]
       hover:bg-[var(--color-brand-hover)] hover:enabled:bg-[var(--color-brand-hover)]
+      shadow-[var(--shadow-1)] hover:shadow-[var(--shadow-2)]
     `,
     secondary: `
       bg-[var(--color-bg-elevated)] text-[var(--color-text-default)]
       border border-[var(--color-border-default)]
       hover:bg-[var(--color-bg-default)] hover:enabled:bg-[var(--color-bg-default)]
+      shadow-[var(--shadow-1)] hover:shadow-[var(--shadow-2)]
     `,
     danger: `
       bg-[var(--color-danger)] text-white
       hover:opacity-90 hover:enabled:opacity-90
+      shadow-[var(--shadow-1)] hover:shadow-[var(--shadow-2)]
     `,
     ghost: `
       bg-transparent text-[var(--color-text-default)]
