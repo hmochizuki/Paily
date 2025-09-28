@@ -1,6 +1,7 @@
 "use client";
 
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -9,14 +10,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Supabase public env vars are not set");
 }
 
+let browserClient: SupabaseClient | null = null;
+
 export function createSupabaseBrowserClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error("Supabase public env vars are not set");
   }
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-  });
+
+  if (!browserClient) {
+    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  }
+
+  return browserClient;
 }
