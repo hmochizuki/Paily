@@ -95,6 +95,30 @@ model Post {
 - Geistフォントファミリーを使用
 - `src/app/globals.css`でグローバルスタイル定義
 
+#### z-indexの管理
+z-indexは必ずCSS変数として`globals.css`で定義し、グローバルに管理すること：
+
+```css
+/* globals.cssで定義されているz-index変数 */
+--z-index-dropdown: 10;
+--z-index-modal-backdrop: 20;
+--z-index-modal: 30;
+--z-index-popover: 40;
+--z-index-tooltip: 50;
+--z-index-header: 100;
+--z-index-bottom-nav: 100;
+--z-index-notification: 200;
+```
+
+使用例：
+```tsx
+// ✅ 良い例 - CSS変数を使用
+<div className="z-[var(--z-index-modal)]">
+
+// ❌ 悪い例 - ハードコーディング
+<div className="z-50">
+```
+
 ### コード品質管理
 - **Biome**: リンターおよびフォーマッターとして使用
 - TypeScript strictモードを有効化（`tsconfig.json`）

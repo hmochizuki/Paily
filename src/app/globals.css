@@ -66,6 +66,16 @@
 /* === 任意の “非ユーティリティ” 変数 === */
 :root {
   --focus-ring: oklch(0.77 0.16 260);
+  
+  /* z-index の階層管理 */
+  --z-index-dropdown: 10;
+  --z-index-modal-backdrop: 20;
+  --z-index-modal: 30;
+  --z-index-popover: 40;
+  --z-index-tooltip: 50;
+  --z-index-header: 100;
+  --z-index-bottom-nav: 100;
+  --z-index-notification: 200;
 }
 
 /* ベース */

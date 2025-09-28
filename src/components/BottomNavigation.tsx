@@ -99,7 +99,7 @@ const navItems: NavItem[] = [
 
 export default function BottomNavigation({ activeIndex = 0 }: BottomNavigationProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[var(--z-index-bottom-nav)]">
       <div className="grid grid-cols-4 py-2">
         {navItems.map((item, index) => (
           <button
