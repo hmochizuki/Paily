@@ -1,58 +1,18 @@
-import Form from "next/form";
-import Button from "@/common/ui/Button";
-import TextField from "@/common/ui/TextField";
-import { prisma } from "@/lib/prisma";
+import LoginForm from "@/features/auth/login-form";
 
 export default function Home() {
-  // Server Action
-  async function createUser(formData: FormData) {
-    "use server";
-
-    const name = formData.get("name");
-    const email = formData.get("email");
-
-    try {
-      // ユーザー作成処理
-      await prisma.user.create({
-        data: {
-          name: name as string,
-          email: email as string,
-        },
-      });
-
-      console.log("ユーザー作成に成功しました");
-    } catch (error) {
-      console.error(`ユーザー作成に失敗しました, ${error}`);
-    }
-  }
-
   return (
-    <div className="px-4 py-6">
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-[var(--color-text-default)] mb-2">
-          ようこそ
-        </h2>
-        <p className="text-[var(--color-text-muted)]">新規ユーザー登録をしてください</p>
+    <div className="px-4 py-10 max-w-md mx-auto space-y-6">
+      <div className="space-y-2 text-center">
+        <h1 className="text-2xl font-semibold text-[var(--color-text-default)]">
+          ふたりの暮らしを整えよう
+        </h1>
+        <p className="text-sm text-[var(--color-text-muted)]">
+          アカウントにログインして共有スペースを作成してください。
+        </p>
       </div>
 
-      <Form action={createUser} className="space-y-5">
-        <TextField
-          name="name"
-          label="名前"
-          placeholder="山田 太郎"
-          required
-        />
-        <TextField
-          name="email"
-          type="email"
-          label="メールアドレス"
-          placeholder="example@mail.com"
-          required
-        />
-        <Button type="submit" fullWidth size="lg">
-          ユーザーを作成
-        </Button>
-      </Form>
+      <LoginForm />
     </div>
   );
 }
