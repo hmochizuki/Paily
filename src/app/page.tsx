@@ -1,6 +1,6 @@
 import Form from "next/form";
-import Button from "@/components/ui/Button";
-import TextField from "@/components/ui/TextField";
+import Button from "@/common/ui/Button";
+import TextField from "@/common/ui/TextField";
 import { prisma } from "@/lib/prisma";
 
 export default function Home() {
