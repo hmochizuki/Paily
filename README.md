@@ -111,3 +111,8 @@ pnpm dev
 ### その他のプラットフォーム
 
 `pnpm build`でプロダクションビルドを作成し、Node.js環境でデプロイしてください。
+
+# リンク
+
+- [supabase](https://supabase.com/dashboard/project/asvlfhqtdsxxvbnvlwhv)
+- [vercel](https://vercel.com/hmochizukis-projects/pairy)
