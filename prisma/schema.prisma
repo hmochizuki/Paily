@@ -1,12 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema aligned with current MVP data model
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -15,18 +10,121 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model Profile {
+  id          String   @id @db.Uuid
+  displayName String   @map("display_name")
+  gender      String?
+  avatarUrl   String?  @map("avatar_url")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  couples            CouplePartner[]
+  invitesSent        PartnerInvite[]         @relation("InviteInviter")
+  invitesAccepted    PartnerInvite[]         @relation("InviteAccepted")
+  shoppingListItems  ShoppingListItem[]      @relation("ItemAddedBy")
+  shoppingItemStates ShoppingListItemState[] @relation("ItemStateCheckedBy")
+
+  @@map("profiles")
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
+model Couple {
+  id        String   @id @db.Uuid
+  name      String?
+  timezone  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  partners   CouplePartner[]
+  invites    PartnerInvite[]
+  lists      ShoppingList[]
+  listItems  ShoppingListItem[]
+  itemStates ShoppingListItemState[]
+
+  @@map("couples")
+}
+
+model CouplePartner {
+  coupleId  String   @map("couple_id") @db.Uuid
+  profileId String   @map("profile_id") @db.Uuid
+  joinedAt  DateTime @default(now()) @map("joined_at") @db.Timestamptz(6)
+  status    String   @default("active")
+
+  couple  Couple  @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([coupleId, profileId])
+  @@map("couple_partners")
+}
+
+model PartnerInvite {
+  id                String   @id @db.Uuid
+  coupleId          String   @map("couple_id") @db.Uuid
+  email             String
+  inviterProfileId  String   @map("inviter_profile_id") @db.Uuid
+  code              String   @unique
+  expiresAt         DateTime @map("expires_at") @db.Timestamptz(6)
+  acceptedProfileId String?  @map("accepted_profile_id") @db.Uuid
+  status            String   @default("pending")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  couple          Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  inviter         Profile  @relation("InviteInviter", fields: [inviterProfileId], references: [id], onDelete: Cascade)
+  acceptedProfile Profile? @relation("InviteAccepted", fields: [acceptedProfileId], references: [id])
+
+  @@map("partner_invites")
+}
+
+model ShoppingList {
+  id        String   @id @db.Uuid
+  coupleId  String   @map("couple_id") @db.Uuid
   title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+  isActive  Boolean  @default(true) @map("is_active")
+  revision  BigInt   @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  couple Couple             @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  items  ShoppingListItem[]
+
+  @@index([coupleId])
+  @@map("shopping_lists")
+}
+
+model ShoppingListItem {
+  id        String   @id @db.Uuid
+  listId    String   @map("list_id") @db.Uuid
+  coupleId  String   @map("couple_id") @db.Uuid
+  addedById String   @map("added_by") @db.Uuid
+  name      String
+  category  String?
+  note      String?
+  quantity  String?
+  revision  BigInt   @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  list    ShoppingList           @relation(fields: [listId], references: [id], onDelete: Cascade)
+  couple  Couple                 @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  addedBy Profile                @relation("ItemAddedBy", fields: [addedById], references: [id], onDelete: Cascade)
+  state   ShoppingListItemState?
+
+  @@index([listId])
+  @@index([coupleId])
+  @@map("shopping_list_items")
+}
+
+model ShoppingListItemState {
+  itemId      String    @id @map("item_id") @db.Uuid
+  coupleId    String    @map("couple_id") @db.Uuid
+  isChecked   Boolean   @default(false) @map("is_checked")
+  checkedById String?   @map("checked_by") @db.Uuid
+  checkedAt   DateTime? @map("checked_at") @db.Timestamptz(6)
+
+  item      ShoppingListItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  couple    Couple           @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  checkedBy Profile?         @relation("ItemStateCheckedBy", fields: [checkedById], references: [id])
+
+  @@index([isChecked])
+  @@index([coupleId, isChecked])
+  @@map("shopping_list_item_states")
 }
