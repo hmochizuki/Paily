@@ -1,27 +1,37 @@
 {
   "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+    "editor.defaultFormatter": "biomejs.biome"
   },
-  "cSpell.words": [
-    "autoincrement"
-  ],
-  "deno.enablePaths": [
-    "supabase/functions"
-  ],
-  "deno.lint": true,
-  "deno.unstable": [
-    "bare-node-builtins",
-    "byonm",
-    "sloppy-imports",
-    "unsafe-proto",
-    "webgpu",
-    "broadcast-channel",
-    "worker-options",
-    "cron",
-    "kv",
-    "ffi",
-    "fs",
-    "http",
-    "net"
-  ]
-}
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "[tailwindcss]": {
+      "editor.defaultFormatter": "bradlc.vscode-tailwindcss"
+    },
+    "cSpell.words": [
+      "autoincrement"
+    ],
+    "deno.enablePaths": [
+      "supabase/functions"
+    ],
+    "deno.lint": true,
+    "deno.unstable": [
+      "bare-node-builtins",
+      "byonm",
+      "sloppy-imports",
+      "unsafe-proto",
+      "webgpu",
+      "broadcast-channel",
+      "worker-options",
+      "cron",
+      "kv",
+      "ffi",
+      "fs",
+      "http",
+      "net"
+    ]
+  }

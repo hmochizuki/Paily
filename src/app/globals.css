@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* === ダークバリアント（CSS-first） === */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* === デザイントークン === */
+@theme {
+  /* スペーシング */
+  --spacing: 4px;
+  /* p-3 などが使えるよう設定 */
+  --spacing-0: 0px;
+  --spacing-1: calc(var(--spacing) * 1);
+  --spacing-2: calc(var(--spacing) * 2);
+  --spacing-3: calc(var(--spacing) * 3);
+  --spacing-4: calc(var(--spacing) * 4);
+  --spacing-6: calc(var(--spacing) * 6);
+  --spacing-8: calc(var(--spacing) * 8);
+  --spacing-12: calc(var(--spacing) * 12);
+
+  /* 角丸・影 */
+  --radius-1: 4px;
+  --radius-2: 8px;
+  --radius-3: 12px;
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.06);
+  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.10);
+
+  /* パレット */
+  --color-brand: oklch(0.73 0.17 258);
+  --color-brand-contrast: #ffffff;
+
+  /* セマンティック色 */
+  --color-bg-default: var(--color-slate-50);
+  --color-bg-elevated: white;
+  --color-text-default: var(--color-slate-950);
+  --color-text-muted: var(--color-slate-600);
+  --color-border-default: var(--color-slate-200);
 }
 
+/* 既存変数を参照するエイリアス */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* next/font の CSS 変数を Tailwind の `font-sans` に割り当て */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* === ダークテーマのトークン上書き === */
+@layer theme {
+  .dark & {
+    /* セマンティック色の上書き */
+    --color-bg-default: var(--color-slate-950);
+    --color-bg-elevated: var(--color-slate-800);
+    --color-text-default: var(--color-slate-50);
+    --color-text-muted: var(--color-slate-400);
+    --color-border-default: var(--color-slate-700);
+
+    /* ブランドのコントラストを暗所向けに微調整 */
+    --color-brand: oklch(0.80 0.12 258);
+    --color-brand-contrast: #0b1020;
   }
 }
 
+/* === 任意の “非ユーティリティ” 変数 === */
+:root {
+  --focus-ring: oklch(0.77 0.16 260);
+}
+
+/* ベース */
+html, body { height: 100%; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-default);
+  color: var(--color-text-default);
+}
+
+/* フォーカスリング */
+:where(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
