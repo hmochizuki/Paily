@@ -10,6 +10,7 @@
 - [`alpha-mvp-spec.md`](alpha-mvp-spec.md): 初期開発に向けた機能要件・非機能要件・未決事項。
 - [`user-stories.md`](user-stories.md): 主要なふたりのジャーニーを整理したストーリー。
 - [`data-model.md`](data-model.md): Supabase/Prisma向けのテーブル設計と拡張方針。
+- [`screen-architecture.md`](screen-architecture.md): アルファMVPの画面構成とナビゲーション設計。
 
 ## 運用のヒント
 - 調査・検証のたびに更新し、最新の学びを反映する。
