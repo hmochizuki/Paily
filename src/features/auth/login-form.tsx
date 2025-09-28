@@ -100,7 +100,7 @@ export default function LoginForm() {
         {mode === "sign-in" ? (
           <button
             type="button"
-            className="text-[var(--color-brand)] underline"
+            className="text-[var(--color-brand-dark)] font-medium underline hover:text-[var(--color-brand)] transition-colors"
             onClick={() => setMode("sign-up")}
             disabled={isPending}
           >
@@ -109,7 +109,7 @@ export default function LoginForm() {
         ) : (
           <button
             type="button"
-            className="text-[var(--color-brand)] underline"
+            className="text-[var(--color-brand-dark)] font-medium underline hover:text-[var(--color-brand)] transition-colors"
             onClick={() => setMode("sign-in")}
             disabled={isPending}
           >
