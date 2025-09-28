@@ -63,6 +63,8 @@ export default function LoginForm() {
         }
       }
 
+      console.log("!!!!!!!!!!!!!!!!!!!");
+
       router.replace("/couple/create");
       router.refresh();
     });
