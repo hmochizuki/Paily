@@ -54,27 +54,6 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: "追加",
-    icon: (
-      <svg
-        className="w-6 h-6 mb-1"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-label="追加"
-      >
-        <title>追加</title>
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 4v16m8-8H4"
-        />
-      </svg>
-    ),
-  },
-  {
     label: "プロフィール",
     icon: (
       <svg
@@ -100,7 +79,7 @@ const navItems: NavItem[] = [
 export default function BottomNavigation({ activeIndex = 0 }: BottomNavigationProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[var(--z-index-bottom-nav)]">
-      <div className="grid grid-cols-4 py-2">
+      <div className="grid grid-cols-3 py-2">
         {navItems.map((item, index) => (
           <button
             key={item.label}
