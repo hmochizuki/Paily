@@ -7,10 +7,10 @@ import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { generateInviteCode, INVITE_CODE_REGEX } from "@/utils/invite-code";
 
-export type CreateCoupleState = {
-  status: "idle" | "error";
-  message?: string;
-};
+export type CreateCoupleState =
+  | { status: "idle" }
+  | { status: "error"; message: string }
+  | { status: "success"; inviteCode: string; inviteUrl: string };
 
 function errorState(message: string): CreateCoupleState {
   return { status: "error", message };
@@ -38,12 +38,8 @@ export async function createCoupleAction(
   }
 
   const timezone = "Asia/Tokyo";
-  const inviteEmail = (formData.get("inviteEmail") as string | null)?.trim();
+  const origin = (formData.get("origin") as string | null)?.trim() ?? "";
   const inviteCodeInput = (formData.get("inviteCode") as string | null)?.trim();
-
-  if (!inviteEmail) {
-    return errorState("招待先のメールアドレスを入力してください。");
-  }
 
   let finalCode = inviteCodeInput
     ? inviteCodeInput.toUpperCase()
@@ -58,6 +54,8 @@ export async function createCoupleAction(
 
   try {
     await prisma.$transaction(async (tx) => {
+      const emptyCode = (code: string) => code === "";
+
       const existingProfile = await tx.profile.findUnique({
         where: { id: user.id },
       });
@@ -87,7 +85,7 @@ export async function createCoupleAction(
         });
       }
 
-      await tx.couples.create({
+      await tx.couple.create({
         data: {
           id: coupleId,
           timezone,
@@ -108,7 +106,7 @@ export async function createCoupleAction(
             data: {
               id: inviteId,
               coupleId,
-              email: inviteEmail.toLowerCase(),
+              email: user.email?.toLowerCase() ?? "",
               inviterProfileId: user.id,
               code: finalCode,
               expiresAt,
@@ -142,5 +140,6 @@ export async function createCoupleAction(
   revalidatePath("/couple/create");
   revalidatePath("/couple/invitations");
 
-  redirect("/couple/invitations");
+  const inviteUrl = origin ? `${origin}/invite/${finalCode}` : `/invite/${finalCode}`;
+  return { status: "success", inviteCode: finalCode, inviteUrl };
 }
