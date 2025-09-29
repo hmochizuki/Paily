@@ -82,27 +82,27 @@ export async function createCoupleAction(
         });
       }
 
-        try {
-          await tx.partnerInvite.create({
-            data: {
-              id: inviteId,
-              coupleId,
-              email: user.email?.toLowerCase() ?? "",
-              inviterProfileId: user.id,
-              code: finalCode,
-              expiresAt,
-            },
-          });
-        } catch (error) {
-          if (
-            error instanceof Prisma.PrismaClientKnownRequestError &&
-            error.code === "P2002"
-          ) {
-            finalCode = generateInviteCode(finalCode.length);
-          }
-          throw error;
+      try {
+        await tx.partnerInvite.create({
+          data: {
+            id: inviteId,
+            coupleId,
+            email: user.email?.toLowerCase() ?? "",
+            inviterProfileId: user.id,
+            code: finalCode,
+            expiresAt,
+          },
+        });
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002"
+        ) {
+          finalCode = generateInviteCode(finalCode.length);
         }
+        throw error;
       }
+    });
   } catch (error) {
     console.error("Failed to create couple", error);
     return errorState(
