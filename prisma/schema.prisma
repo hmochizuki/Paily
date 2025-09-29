@@ -61,7 +61,7 @@ model PartnerInvite {
   coupleId          String   @map("couple_id") @db.Uuid
   email             String
   inviterProfileId  String   @map("inviter_profile_id") @db.Uuid
-  code              String   @unique
+  code              String
   expiresAt         DateTime @map("expires_at") @db.Timestamptz(6)
   acceptedProfileId String?  @map("accepted_profile_id") @db.Uuid
   status            String   @default("pending")
