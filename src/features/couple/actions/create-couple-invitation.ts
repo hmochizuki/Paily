@@ -16,7 +16,7 @@ function errorState(message: string): CreateCoupleState {
   return { status: "error", message };
 }
 
-export async function createCoupleAction(
+export async function createCoupleInvitationAction(
   _prevState: CreateCoupleState,
   formData: FormData,
 ): Promise<CreateCoupleState> {

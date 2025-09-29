@@ -1,5 +1,5 @@
 import Link from "next/link";
-import CreateCoupleForm from "@/features/couple/create-couple-form";
+import CreateCoupleInvitationForm from "@/features/couple/create-couple-invitation-form";
 
 export const metadata = {
   title: "カップルスペースを作成",
@@ -17,7 +17,7 @@ export default function CoupleCreatePage() {
         </p>
       </div>
 
-      <CreateCoupleForm />
+      <CreateCoupleInvitationForm />
 
       <div className="flex justify-end text-sm">
         <Link

@@ -5,13 +5,16 @@ import Button from "@/common/ui/form/Button";
 import TextField from "@/common/ui/form/TextField";
 import {
   type CreateCoupleState,
-  createCoupleAction,
-} from "@/features/couple/actions/create-couple";
+  createCoupleInvitationAction,
+} from "@/features/couple/actions/create-couple-invitation";
 
 const INITIAL_STATE: CreateCoupleState = { status: "idle" };
 
-export default function CreateCoupleForm() {
-  const [state, formAction] = useActionState(createCoupleAction, INITIAL_STATE);
+export default function CreateCoupleInvitationForm() {
+  const [state, formAction] = useActionState(
+    createCoupleInvitationAction,
+    INITIAL_STATE,
+  );
   const [isPending, startTransition] = useTransition();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
