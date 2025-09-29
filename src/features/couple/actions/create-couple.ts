@@ -37,7 +37,6 @@ export async function createCoupleAction(
     redirect("/");
   }
 
-  const timezone = "Asia/Tokyo";
   const origin = (formData.get("origin") as string | null)?.trim() ?? "";
   const inviteCodeInput = (formData.get("inviteCode") as string | null)?.trim();
 
@@ -54,8 +53,6 @@ export async function createCoupleAction(
 
   try {
     await prisma.$transaction(async (tx) => {
-      const emptyCode = (code: string) => code === "";
-
       const existingProfile = await tx.profile.findUnique({
         where: { id: user.id },
       });
@@ -85,22 +82,6 @@ export async function createCoupleAction(
         });
       }
 
-      await tx.couple.create({
-        data: {
-          id: coupleId,
-          timezone,
-        },
-      });
-
-      await tx.couplePartner.create({
-        data: {
-          coupleId,
-          profileId: user.id,
-        },
-      });
-
-      let attempts = 0;
-      while (attempts < 5) {
         try {
           await tx.partnerInvite.create({
             data: {
@@ -112,24 +93,16 @@ export async function createCoupleAction(
               expiresAt,
             },
           });
-          break;
         } catch (error) {
           if (
             error instanceof Prisma.PrismaClientKnownRequestError &&
             error.code === "P2002"
           ) {
             finalCode = generateInviteCode(finalCode.length);
-            attempts += 1;
-            continue;
           }
           throw error;
         }
       }
-
-      if (attempts === 5) {
-        throw new Error("Failed to generate unique invite code");
-      }
-    });
   } catch (error) {
     console.error("Failed to create couple", error);
     return errorState(
@@ -140,6 +113,8 @@ export async function createCoupleAction(
   revalidatePath("/couple/create");
   revalidatePath("/couple/invitations");
 
-  const inviteUrl = origin ? `${origin}/invite/${finalCode}` : `/invite/${finalCode}`;
+  const inviteUrl = origin
+    ? `${origin}/invite/${finalCode}`
+    : `/invite/${finalCode}`;
   return { status: "success", inviteCode: finalCode, inviteUrl };
 }
