@@ -29,7 +29,8 @@
         "noUnknownAtRules": "off"
       },
       "style": {
-        "noNonNullAssertion": "error"
+        "noNonNullAssertion": "error",
+        "useConst": "error"
       },
       "correctness": {
         "noUnusedVariables": "error"
