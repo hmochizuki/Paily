@@ -51,10 +51,8 @@ export async function createCoupleInvitationAction(
   const inviteEmailInput = (
     formData.get("inviteEmail") as string | null
   )?.trim();
-  const coupleNameInput = (formData.get("coupleName") as string | null)?.trim();
-  const timezoneInput = (formData.get("timezone") as string | null)?.trim();
 
-  let initialCode = inviteCodeInput
+  const initialCode = inviteCodeInput
     ? inviteCodeInput.toUpperCase()
     : generateInviteCode(6);
   if (!INVITE_CODE_REGEX.test(initialCode)) {
@@ -66,12 +64,8 @@ export async function createCoupleInvitationAction(
     return errorState("招待メールアドレスを入力してください。", "400");
   }
 
-  const timezone =
-    timezoneInput && timezoneInput.length > 0
-      ? timezoneInput
-      : Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  const coupleName =
-    coupleNameInput && coupleNameInput.length > 0 ? coupleNameInput : null;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const coupleName = null;
 
   const inviteId = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);

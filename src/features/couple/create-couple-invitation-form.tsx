@@ -5,7 +5,6 @@ import {
   useEffect,
   useState,
   useTransition,
-  type ChangeEvent,
 } from "react";
 import Button from "@/common/ui/form/Button";
 import TextField from "@/common/ui/form/TextField";
@@ -26,7 +25,6 @@ export default function CreateCoupleInvitationForm() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle",
   );
-  const [timezone, setTimezone] = useState("Asia/Tokyo");
 
   useEffect(() => {
     if (state.status === "success") {
@@ -34,15 +32,6 @@ export default function CreateCoupleInvitationForm() {
       setCopyStatus("idle");
     }
   }, [state]);
-
-  useEffect(() => {
-    if (typeof Intl !== "undefined") {
-      const resolved = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (resolved) {
-        setTimezone(resolved);
-      }
-    }
-  }, []);
 
   const handleCopy = async (text: string) => {
     try {
@@ -70,12 +59,6 @@ export default function CreateCoupleInvitationForm() {
       >
         <div className="grid gap-4">
           <TextField
-            name="coupleName"
-            label="スペース名（任意）"
-            placeholder="例: ゆうた＆みさき"
-            maxLength={50}
-          />
-          <TextField
             name="inviteEmail"
             type="email"
             label="招待メールアドレス"
@@ -84,19 +67,8 @@ export default function CreateCoupleInvitationForm() {
             required
           />
           <TextField
-            name="timezone"
-            label="タイムゾーン"
-            placeholder="Asia/Tokyo"
-            required
-            value={timezone}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setTimezone(event.target.value)
-            }
-            helperText="IANA形式（例: Asia/Tokyo）で入力してください。"
-          />
-          <TextField
             name="inviteCode"
-            label="招待コード（任意）"
+            label="招待コード(任意)"
             placeholder="英字4〜12文字"
             helperText="未入力の場合は自動で発行されます。"
             inputMode="text"
