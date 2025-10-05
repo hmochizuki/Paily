@@ -7,13 +7,19 @@ import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { generateInviteCode, INVITE_CODE_REGEX } from "@/utils/invite-code";
 
+type ErrorCode = "400" | "401" | "403" | "404" | "500";
+
 export type CreateCoupleState =
   | { status: "idle" }
-  | { status: "error"; message: string }
+  | {
+      status: "error";
+      message: string;
+      code: ErrorCode;
+    }
   | { status: "success"; inviteCode: string; inviteUrl: string };
 
-function errorState(message: string): CreateCoupleState {
-  return { status: "error", message };
+function errorState(message: string, code: ErrorCode): CreateCoupleState {
+  return { status: "error", message, code };
 }
 
 export async function createCoupleInvitationAction(
@@ -22,16 +28,19 @@ export async function createCoupleInvitationAction(
 ): Promise<CreateCoupleState> {
   const supabase = await createSupabaseServerClient();
   const {
-    data: { user },
+    data: { session },
     error: sessionError,
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getSession();
 
   if (sessionError) {
     console.error("Failed to fetch Supabase user", sessionError);
     return errorState(
       "認証情報を取得できませんでした。再度ログインしてください。",
+      "401",
     );
   }
+
+  const user = session?.user;
 
   if (!user) {
     redirect("/");
@@ -39,17 +48,34 @@ export async function createCoupleInvitationAction(
 
   const origin = (formData.get("origin") as string | null)?.trim() ?? "";
   const inviteCodeInput = (formData.get("inviteCode") as string | null)?.trim();
+  const inviteEmailInput = (
+    formData.get("inviteEmail") as string | null
+  )?.trim();
+  const coupleNameInput = (formData.get("coupleName") as string | null)?.trim();
+  const timezoneInput = (formData.get("timezone") as string | null)?.trim();
 
-  let finalCode = inviteCodeInput
+  let initialCode = inviteCodeInput
     ? inviteCodeInput.toUpperCase()
     : generateInviteCode(6);
-  if (!INVITE_CODE_REGEX.test(finalCode)) {
-    return errorState("招待コードは英字4〜12文字で指定してください。");
+  if (!INVITE_CODE_REGEX.test(initialCode)) {
+    return errorState("招待コードは英字4〜12文字で指定してください。", "400");
   }
 
-  const coupleId = crypto.randomUUID();
+  const inviteEmail = inviteEmailInput?.toLowerCase() ?? null;
+  if (!inviteEmail) {
+    return errorState("招待メールアドレスを入力してください。", "400");
+  }
+
+  const timezone =
+    timezoneInput && timezoneInput.length > 0
+      ? timezoneInput
+      : Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const coupleName =
+    coupleNameInput && coupleNameInput.length > 0 ? coupleNameInput : null;
+
   const inviteId = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
+  let finalCode = initialCode;
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -82,37 +108,71 @@ export async function createCoupleInvitationAction(
         });
       }
 
-      try {
-        await tx.partnerInvite.create({
+      const membership = await tx.couplePartner.findFirst({
+        where: { profileId: user.id },
+        select: { coupleId: true },
+      });
+
+      let coupleId = membership?.coupleId;
+
+      if (!coupleId) {
+        coupleId = crypto.randomUUID();
+
+        await tx.couple.create({
           data: {
-            id: inviteId,
-            coupleId,
-            email: user.email?.toLowerCase() ?? "",
-            inviterProfileId: user.id,
-            code: finalCode,
-            expiresAt,
+            id: coupleId,
+            name: coupleName,
+            timezone,
           },
         });
-      } catch (error) {
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === "P2002"
-        ) {
-          finalCode = generateInviteCode(finalCode.length);
+
+        await tx.couplePartner.create({
+          data: {
+            coupleId,
+            profileId: user.id,
+            status: "active",
+          },
+        });
+      }
+
+      let codeToUse = initialCode;
+
+      while (true) {
+        try {
+          await tx.partnerInvite.create({
+            data: {
+              id: inviteId,
+              coupleId,
+              email: inviteEmail,
+              inviterProfileId: user.id,
+              code: codeToUse,
+              expiresAt,
+            },
+          });
+          finalCode = codeToUse;
+          break;
+        } catch (error) {
+          if (
+            error instanceof Prisma.PrismaClientKnownRequestError &&
+            error.code === "P2002"
+          ) {
+            codeToUse = generateInviteCode(codeToUse.length);
+            continue;
+          }
+          throw error;
         }
-        throw error;
       }
     });
   } catch (error) {
     console.error("Failed to create couple", error);
     return errorState(
       "スペースの作成に失敗しました。時間をおいて再度お試しください。",
+      "500",
     );
   }
 
   revalidatePath("/couple/create");
   revalidatePath("/couple/invitations");
-
   const inviteUrl = origin
     ? `${origin}/invite/${finalCode}`
     : `/invite/${finalCode}`;

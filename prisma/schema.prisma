@@ -34,11 +34,11 @@ model Couple {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
-  partners   CouplePartner[]
-  invites    PartnerInvite[]
-  lists      ShoppingList[]
-  listItems  ShoppingListItem[]
-  itemStates ShoppingListItemState[]
+  partners CouplePartner[]
+  invites  PartnerInvite[]
+  lists    ShoppingList[]
+  items    ShoppingListItem[]
+  states   ShoppingListItemState[]
 
   @@map("couples")
 }
@@ -58,8 +58,8 @@ model CouplePartner {
 
 model PartnerInvite {
   id                String   @id @db.Uuid
-  coupleId          String   @map("couple_id") @db.Uuid
-  email             String
+  coupleId          String?  @map("couple_id") @db.Uuid
+  email             String?
   inviterProfileId  String   @map("inviter_profile_id") @db.Uuid
   code              String
   expiresAt         DateTime @map("expires_at") @db.Timestamptz(6)
@@ -67,7 +67,7 @@ model PartnerInvite {
   status            String   @default("pending")
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  couple          Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  couple          Couple?  @relation(fields: [coupleId], references: [id], onDelete: SetNull)
   inviter         Profile  @relation("InviteInviter", fields: [inviterProfileId], references: [id], onDelete: Cascade)
   acceptedProfile Profile? @relation("InviteAccepted", fields: [acceptedProfileId], references: [id])
 
@@ -83,7 +83,7 @@ model ShoppingList {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
-  couple Couple             @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  couple Couple @relation(fields: [coupleId], references: [id], onDelete: Cascade)
   items  ShoppingListItem[]
 
   @@index([coupleId])

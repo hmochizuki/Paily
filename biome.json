@@ -33,7 +33,8 @@
         "useConst": "error"
       },
       "correctness": {
-        "noUnusedVariables": "error"
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
       }
     },
     "domains": {
