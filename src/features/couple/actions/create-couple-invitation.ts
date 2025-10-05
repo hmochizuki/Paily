@@ -64,9 +64,6 @@ export async function createCoupleInvitationAction(
     return errorState("招待メールアドレスを入力してください。", "400");
   }
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  const coupleName = null;
-
   const inviteId = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
   let finalCode = initialCode;
@@ -115,8 +112,6 @@ export async function createCoupleInvitationAction(
         await tx.couple.create({
           data: {
             id: coupleId,
-            name: coupleName,
-            timezone,
           },
         });
 

@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
+
 interface NavItem {
   label: string;
   icon: React.ReactNode;
-  isActive?: boolean;
+  href: string;
 }
 
 interface BottomNavigationProps {
@@ -13,6 +15,7 @@ interface BottomNavigationProps {
 const navItems: NavItem[] = [
   {
     label: "ホーム",
+    href: "/lists",
     icon: (
       <svg
         className="w-6 h-6 mb-1"
@@ -34,6 +37,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "一覧",
+    href: "/lists",
     icon: (
       <svg
         className="w-6 h-6 mb-1"
@@ -55,6 +59,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "プロフィール",
+    href: "/settings/profile",
     icon: (
       <svg
         className="w-6 h-6 mb-1"
@@ -76,21 +81,25 @@ const navItems: NavItem[] = [
   },
 ];
 
-export default function BottomNavigation({ activeIndex = 0 }: BottomNavigationProps) {
+export default function BottomNavigation({
+  activeIndex = 0,
+}: BottomNavigationProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[var(--z-index-bottom-nav)]">
       <div className="grid grid-cols-3 py-2">
         {navItems.map((item, index) => (
-          <button
+          <Link
             key={item.label}
-            type="button"
+            href={item.href}
             className={`flex flex-col items-center justify-center py-2 transition-colors ${
-              index === activeIndex ? "text-[var(--color-brand-hover)]" : "text-gray-600"
+              index === activeIndex
+                ? "text-[var(--color-brand-hover)]"
+                : "text-gray-600"
             }`}
           >
             {item.icon}
             <span className="text-xs font-medium">{item.label}</span>
-          </button>
+          </Link>
         ))}
       </div>
     </nav>

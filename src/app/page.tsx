@@ -2,11 +2,25 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import LoginForm from "@/features/auth/login-form";
 import { getSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export default async function Home() {
   const session = await getSession();
 
   if (session?.user) {
+    const profile = await prisma.profile.findUnique({
+      where: { id: session.user.id },
+      include: {
+        couples: {
+          select: { coupleId: true },
+        },
+      },
+    });
+
+    if (profile?.couples && profile.couples.length > 0) {
+      redirect("/lists");
+    }
+
     redirect("/couple/create");
   }
 

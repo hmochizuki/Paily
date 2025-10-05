@@ -10,7 +10,8 @@ export default function Header() {
           width={24}
           height={24}
           style={{
-            filter: "brightness(0) saturate(100%) invert(27%) sepia(16%) saturate(638%) hue-rotate(315deg) brightness(92%) contrast(87%)"
+            filter:
+              "brightness(0) saturate(100%) invert(27%) sepia(16%) saturate(638%) hue-rotate(315deg) brightness(92%) contrast(87%)",
           }}
         />
         <h1 className="text-xl font-bold text-[var(--color-brand-contrast)]">

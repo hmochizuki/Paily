@@ -1,10 +1,12 @@
 interface ListDetailPageProps {
-  params: {
+  params: Promise<{
     listId: string;
-  };
+  }>;
 }
 
-export default function ListDetailPage({ params }: ListDetailPageProps) {
+export default async function ListDetailPage({ params }: ListDetailPageProps) {
+  const { listId } = await params;
+
   return (
     <div className="space-y-6 px-4 py-10">
       <div className="space-y-2">
@@ -12,7 +14,7 @@ export default function ListDetailPage({ params }: ListDetailPageProps) {
           リスト詳細
         </h1>
         <p className="text-sm text-[var(--color-text-muted)]">
-          リストID: {params.listId}
+          リストID: {listId}
         </p>
       </div>
 

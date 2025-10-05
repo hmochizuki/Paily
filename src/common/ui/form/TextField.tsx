@@ -45,17 +45,27 @@ export default function TextField({
         `}
         aria-invalid={!!error}
         aria-describedby={
-          error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
+          error
+            ? `${inputId}-error`
+            : helperText
+              ? `${inputId}-helper`
+              : undefined
         }
         {...props}
       />
       {error && (
-        <p id={`${inputId}-error`} className="mt-1 text-sm text-[var(--color-danger)]">
+        <p
+          id={`${inputId}-error`}
+          className="mt-1 text-sm text-[var(--color-danger)]"
+        >
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p id={`${inputId}-helper`} className="mt-1 text-sm text-[var(--color-text-muted)]">
+        <p
+          id={`${inputId}-helper`}
+          className="mt-1 text-sm text-[var(--color-text-muted)]"
+        >
           {helperText}
         </p>
       )}

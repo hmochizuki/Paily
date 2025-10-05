@@ -22,24 +22,24 @@
   --radius-3: 12px;
 
   --shadow-1: 0 1px 2px rgb(0 0 0 / 0.06);
-  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.10);
+  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.1);
 
   /* ブランド（淡いピンク + ダークブラウンコントラスト） */
   --color-brand: oklch(0.92 0.05 350);
   --color-brand-hover: oklch(0.85 0.06 350);
-  --color-brand-contrast: #432E36;
+  --color-brand-contrast: #432e36;
 
   /* セマンティック（やわらか背景・優しい黒のテキスト） */
   --color-bg-default: oklch(0.98 0.01 350);
   --color-bg-elevated: #ffffff;
   --color-text-default: oklch(0.22 0.02 350);
   --color-text-muted: oklch(0.45 0.02 350);
-  --color-border-default: oklch(0.90 0.01 350);
+  --color-border-default: oklch(0.9 0.01 350);
 
   /* ステート（少し柔らかめ）—必要に応じて使用 */
   --color-success: oklch(0.85 0.14 160);
-  --color-warning: oklch(0.90 0.12 90);
-  --color-danger:  oklch(0.75 0.15 30);
+  --color-warning: oklch(0.9 0.12 90);
+  --color-danger: oklch(0.75 0.15 30);
 }
 
 /* 既存変数を参照するエイリアス（next/font の variable を割り当て） */
@@ -51,14 +51,14 @@
 /* === ダークテーマのトークン上書き（チョコレート系の落ち着き） === */
 @layer theme {
   .dark & {
-    --color-bg-default: oklch(0.20 0.01 20);
+    --color-bg-default: oklch(0.2 0.01 20);
     --color-bg-elevated: oklch(0.26 0.01 20);
     --color-text-default: oklch(0.95 0.01 350);
-    --color-text-muted: oklch(0.70 0.01 350);
+    --color-text-muted: oklch(0.7 0.01 350);
     --color-border-default: oklch(0.35 0.01 20);
 
     --color-brand: oklch(0.82 0.09 350);
-    --color-brand-hover: oklch(0.75 0.10 350);
+    --color-brand-hover: oklch(0.75 0.1 350);
     --color-brand-contrast: #fefefe;
   }
 }
@@ -66,7 +66,7 @@
 /* === 任意の “非ユーティリティ” 変数 === */
 :root {
   --focus-ring: oklch(0.77 0.16 260);
-  
+
   /* z-index の階層管理 */
   --z-index-dropdown: 10;
   --z-index-modal-backdrop: 20;
@@ -79,7 +79,10 @@
 }
 
 /* ベース */
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
 body {
   background: var(--color-bg-default);
   color: var(--color-text-default);

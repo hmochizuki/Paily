@@ -11,6 +11,7 @@
 - [`user-stories.md`](user-stories.md): 主要なふたりのジャーニーを整理したストーリー。
 - [`data-model.md`](data-model.md): Supabase/Prisma向けのテーブル設計と拡張方針。
 - [`screen-architecture.md`](screen-architecture.md): アルファMVPの画面構成とナビゲーション設計。
+- [`screen-flow.md`](screen-flow.md): 認証状態とカップルスペース作成状態に基づいた画面遷移フロー。
 - [`implementation-plan.md`](implementation-plan.md): App Router構成とフェーズ別の実装タスク整理。
 - [`server-architecture.md`](server-architecture.md): サーバーサイドのレイヤードアーキテクチャ設計とリファクタリング指針。
 

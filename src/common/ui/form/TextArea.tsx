@@ -46,17 +46,27 @@ export default function TextArea({
         `}
         aria-invalid={!!error}
         aria-describedby={
-          error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined
+          error
+            ? `${textareaId}-error`
+            : helperText
+              ? `${textareaId}-helper`
+              : undefined
         }
         {...props}
       />
       {error && (
-        <p id={`${textareaId}-error`} className="mt-1 text-sm text-[var(--color-danger)]">
+        <p
+          id={`${textareaId}-error`}
+          className="mt-1 text-sm text-[var(--color-danger)]"
+        >
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p id={`${textareaId}-helper`} className="mt-1 text-sm text-[var(--color-text-muted)]">
+        <p
+          id={`${textareaId}-helper`}
+          className="mt-1 text-sm text-[var(--color-text-muted)]"
+        >
           {helperText}
         </p>
       )}
