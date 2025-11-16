@@ -63,7 +63,7 @@ export default async function ListDetailPage({ params }: ListDetailPageProps) {
   const checkedItems = list.items.filter((item) => item.state?.isChecked);
 
   return (
-    <div className="space-y-6 px-4 py-10">
+    <div className="space-y-6 px-4 pt-4 pb-24">
       <div className="space-y-2">
         <Link
           href="/lists"

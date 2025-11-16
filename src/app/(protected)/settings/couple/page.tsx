@@ -4,7 +4,7 @@ export const metadata = {
 
 export default function CoupleSettingsPage() {
   return (
-    <div className="space-y-6 px-4 py-10">
+    <div className="space-y-6 px-4 pt-4 pb-24">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold text-[var(--color-text-default)]">
           スペース設定
