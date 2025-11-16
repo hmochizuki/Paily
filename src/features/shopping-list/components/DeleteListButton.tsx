@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { deleteListAction } from "../actions/deleteList";
 
 interface DeleteListButtonProps {
@@ -10,16 +10,12 @@ interface DeleteListButtonProps {
 
 export function DeleteListButton({ listId, listTitle }: DeleteListButtonProps) {
   const [isConfirming, setIsConfirming] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
+  const handleDelete = () => {
+    startTransition(async () => {
       await deleteListAction(listId);
-    } catch {
-      setIsDeleting(false);
-      setIsConfirming(false);
-    }
+    });
   };
 
   if (!isConfirming) {
@@ -84,7 +80,7 @@ export function DeleteListButton({ listId, listTitle }: DeleteListButtonProps) {
             type="button"
             onClick={() => setIsConfirming(false)}
             className="rounded-lg border border-[var(--color-border-default)] px-4 py-2 text-sm font-medium text-[var(--color-text-default)] transition-colors hover:bg-[var(--color-bg-subtle)]"
-            disabled={isDeleting}
+            disabled={isPending}
           >
             キャンセル
           </button>
@@ -92,9 +88,9 @@ export function DeleteListButton({ listId, listTitle }: DeleteListButtonProps) {
             type="button"
             onClick={handleDelete}
             className="rounded-lg bg-[var(--color-danger)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
-            disabled={isDeleting}
+            disabled={isPending}
           >
-            {isDeleting ? "削除中..." : "削除"}
+            {isPending ? "削除中..." : "削除"}
           </button>
         </div>
       </div>

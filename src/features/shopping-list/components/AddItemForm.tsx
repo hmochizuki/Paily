@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import { addItemAction } from "../actions/addItem";
 
 interface AddItemFormProps {
@@ -10,20 +10,15 @@ interface AddItemFormProps {
 
 export function AddItemForm({ listId, coupleId }: AddItemFormProps) {
   const [name, setName] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = async (formData: FormData) => {
-    setIsSubmitting(true);
-    try {
+  const handleSubmit = (formData: FormData) => {
+    startTransition(async () => {
       await addItemAction(formData);
       setName("");
       formRef.current?.reset();
-    } catch {
-      // エラー処理
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   return (
@@ -37,14 +32,14 @@ export function AddItemForm({ listId, coupleId }: AddItemFormProps) {
         onChange={(e) => setName(e.target.value)}
         placeholder="アイテムを追加..."
         className="flex-1 rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
-        disabled={isSubmitting}
+        disabled={isPending}
       />
       <button
         type="submit"
-        disabled={isSubmitting || name.trim() === ""}
+        disabled={isPending || name.trim() === ""}
         className="rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] transition-colors hover:bg-[var(--color-brand-hover)] disabled:opacity-50"
       >
-        {isSubmitting ? "追加中..." : "追加"}
+        {isPending ? "追加中..." : "追加"}
       </button>
     </form>
   );

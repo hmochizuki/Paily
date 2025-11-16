@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { createListAction } from "../actions/createList";
 
 interface CreateListButtonProps {
@@ -10,15 +10,12 @@ interface CreateListButtonProps {
 export function CreateListButton({ coupleId }: CreateListButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = async (formData: FormData) => {
-    setIsSubmitting(true);
-    try {
+  const handleSubmit = (formData: FormData) => {
+    startTransition(async () => {
       await createListAction(formData);
-    } catch {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   if (!isOpen) {
@@ -82,16 +79,16 @@ export function CreateListButton({ coupleId }: CreateListButtonProps) {
                 setTitle("");
               }}
               className="rounded-lg border border-[var(--color-border-default)] px-4 py-2 text-sm font-medium text-[var(--color-text-default)] transition-colors hover:bg-[var(--color-bg-subtle)]"
-              disabled={isSubmitting}
+              disabled={isPending}
             >
               キャンセル
             </button>
             <button
               type="submit"
               className="rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] transition-colors hover:bg-[var(--color-brand-hover)] disabled:opacity-50"
-              disabled={isSubmitting || title.trim() === ""}
+              disabled={isPending || title.trim() === ""}
             >
-              {isSubmitting ? "作成中..." : "作成"}
+              {isPending ? "作成中..." : "作成"}
             </button>
           </div>
         </form>

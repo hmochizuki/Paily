@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { deleteItemAction } from "../actions/deleteItem";
 import { toggleItemCheckAction } from "../actions/toggleItemCheck";
 
@@ -22,27 +22,21 @@ interface ShoppingListItemRowProps {
 }
 
 export function ShoppingListItemRow({ item }: ShoppingListItemRowProps) {
-  const [isToggling, setIsToggling] = useState(false);
+  const [isTogglingPending, startToggleTransition] = useTransition();
+  const [isDeletingPending, startDeleteTransition] = useTransition();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleToggle = async () => {
-    setIsToggling(true);
-    try {
+  const handleToggle = () => {
+    startToggleTransition(async () => {
       await toggleItemCheckAction(item.id);
-    } catch {
-      // エラー処理
-    } finally {
-      setIsToggling(false);
-    }
+    });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setIsDeleting(true);
-    try {
+    startDeleteTransition(async () => {
       await deleteItemAction(item.id);
-    } catch {
-      setIsDeleting(false);
-    }
+    });
   };
 
   const isChecked = item.state?.isChecked ?? false;
@@ -52,7 +46,7 @@ export function ShoppingListItemRow({ item }: ShoppingListItemRowProps) {
       <button
         type="button"
         onClick={handleToggle}
-        disabled={isToggling}
+        disabled={isTogglingPending || isDeletingPending}
         className="flex size-6 shrink-0 items-center justify-center rounded border border-[var(--color-border-default)] transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-50"
         aria-label={isChecked ? "未完了にする" : "完了にする"}
       >
@@ -101,7 +95,7 @@ export function ShoppingListItemRow({ item }: ShoppingListItemRowProps) {
       <button
         type="button"
         onClick={handleDelete}
-        disabled={isDeleting}
+        disabled={isDeleting || isDeletingPending || isTogglingPending}
         className="rounded p-1 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)] disabled:opacity-50"
         aria-label="削除"
       >
