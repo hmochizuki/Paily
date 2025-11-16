@@ -210,7 +210,7 @@ export function CalendarView({ events, coupleId }: CalendarViewProps) {
                 }}
                 className={`relative min-h-[60px] border-b border-r border-[var(--color-border-default)] p-1 text-left transition-colors hover:bg-[var(--color-bg-subtle)] ${
                   index % 7 === 6 ? "border-r-0" : ""
-                } ${index >= days.length - 7 ? "border-b-0" : ""} ${isSelected ? "bg-[var(--color-bg-subtle)]" : ""}`}
+                } ${index >= days.length - 7 ? "border-b-0" : ""} ${isSelected ? "bg-pink-50 ring-2 ring-inset ring-[var(--color-brand)]" : ""}`}
               >
                 <span
                   className={`inline-flex size-6 items-center justify-center rounded-full text-xs ${
