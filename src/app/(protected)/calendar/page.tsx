@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { CalendarView } from "@/features/calendar/components/CalendarView";
-import { CreateEventButton } from "@/features/calendar/components/CreateEventButton";
+import { CalendarPageContent } from "@/features/calendar/components/CalendarPageContent";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -11,12 +10,12 @@ export const metadata = {
 export default async function CalendarPage() {
   const user = await requireUser();
 
-  const couplePartner = await prisma.couplePartner.findFirst({
+  const couplePartners = await prisma.couplePartner.findMany({
     where: { profileId: user.id },
     select: { coupleId: true },
   });
 
-  if (!couplePartner) {
+  if (couplePartners.length === 0) {
     return (
       <div className="space-y-6 px-4 pt-4 pb-24">
         <div className="space-y-2">
@@ -45,8 +44,10 @@ export default async function CalendarPage() {
     );
   }
 
+  const userSpaceIds = couplePartners.map((cp) => cp.coupleId);
+
   const eventsData = await prisma.calendarEvent.findMany({
-    where: { coupleId: couplePartner.coupleId },
+    where: { coupleId: { in: userSpaceIds } },
     orderBy: { startAt: "asc" },
     include: {
       createdBy: {
@@ -56,9 +57,15 @@ export default async function CalendarPage() {
   });
 
   const events = eventsData.map((event) => ({
-    ...event,
+    id: event.id,
+    title: event.title,
+    description: event.description,
     startAt: event.startAt.toISOString(),
     endAt: event.endAt ? event.endAt.toISOString() : null,
+    isAllDay: event.isAllDay,
+    color: event.color,
+    coupleId: event.coupleId,
+    createdBy: event.createdBy,
   }));
 
   return (
@@ -72,9 +79,7 @@ export default async function CalendarPage() {
         </p>
       </div>
 
-      <CalendarView events={events} coupleId={couplePartner.coupleId} />
-
-      <CreateEventButton coupleId={couplePartner.coupleId} />
+      <CalendarPageContent allEvents={events} userSpaceIds={userSpaceIds} />
     </div>
   );
 }

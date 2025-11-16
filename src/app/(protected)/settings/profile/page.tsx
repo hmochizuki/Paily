@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/features/auth/actions/logout";
+import { EditDisplayNameForm } from "@/features/profile/components/EditDisplayNameForm";
+import { SpaceSelector } from "@/features/space/components/SpaceSelector";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -15,7 +17,19 @@ export default async function ProfileSettingsPage() {
     where: { id: user.id },
     include: {
       couples: {
-        select: { coupleId: true },
+        include: {
+          couple: {
+            include: {
+              partners: {
+                include: {
+                  profile: {
+                    select: { displayName: true },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   });
@@ -24,7 +38,17 @@ export default async function ProfileSettingsPage() {
     redirect("/");
   }
 
-  const hasCouple = profile.couples && profile.couples.length > 0;
+  const spaces = profile.couples.map((cp) => ({
+    id: cp.couple.id,
+    createdAt: cp.couple.createdAt.toISOString(),
+    partners: cp.couple.partners.map((p) => ({
+      profile: {
+        displayName: p.profile.displayName,
+      },
+    })),
+  }));
+
+  const hasCouple = spaces.length > 0;
 
   return (
     <div className="space-y-6 px-4 pt-4 pb-24">
@@ -47,8 +71,8 @@ export default async function ProfileSettingsPage() {
               <dt className="text-sm font-medium text-[var(--color-text-muted)]">
                 表示名
               </dt>
-              <dd className="mt-1 text-base text-[var(--color-text-default)]">
-                {profile.displayName}
+              <dd className="mt-1">
+                <EditDisplayNameForm currentName={profile.displayName} />
               </dd>
             </div>
             {profile.gender && (
@@ -87,7 +111,9 @@ export default async function ProfileSettingsPage() {
           </dl>
         </div>
 
-        {!hasCouple && (
+        {hasCouple ? (
+          <SpaceSelector spaces={spaces} currentUserId={profile.displayName} />
+        ) : (
           <div className="rounded-lg border border-dashed border-[var(--color-brand)] bg-pink-50 p-6">
             <h2 className="mb-2 text-lg font-semibold text-[var(--color-text-default)]">
               共有スペースを作成
@@ -102,6 +128,15 @@ export default async function ProfileSettingsPage() {
               スペースを作成
             </Link>
           </div>
+        )}
+
+        {hasCouple && (
+          <Link
+            href="/couple/create"
+            className="block w-full rounded-lg border border-[var(--color-border-default)] bg-white px-4 py-3 text-center text-sm font-medium text-[var(--color-text-default)] transition-colors hover:bg-[var(--color-bg-subtle)]"
+          >
+            新しいスペースを作成
+          </Link>
         )}
 
         <form action={logoutAction}>
