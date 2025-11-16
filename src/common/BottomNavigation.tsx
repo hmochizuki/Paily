@@ -1,15 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface NavItem {
   label: string;
   icon: React.ReactNode;
   href: string;
-}
-
-interface BottomNavigationProps {
-  activeIndex?: number;
 }
 
 const navItems: NavItem[] = [
@@ -81,18 +78,31 @@ const navItems: NavItem[] = [
   },
 ];
 
-export default function BottomNavigation({
-  activeIndex = 0,
-}: BottomNavigationProps) {
+export default function BottomNavigation() {
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === "/lists") {
+      return pathname === "/lists" || pathname.startsWith("/lists/");
+    }
+    if (href === "/calendar") {
+      return pathname === "/calendar" || pathname.startsWith("/calendar/");
+    }
+    if (href === "/settings/profile") {
+      return pathname.startsWith("/settings");
+    }
+    return pathname === href;
+  };
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[var(--z-index-bottom-nav)]">
       <div className="grid grid-cols-3 py-2">
-        {navItems.map((item, index) => (
+        {navItems.map((item) => (
           <Link
             key={item.label}
             href={item.href}
             className={`flex flex-col items-center justify-center py-2 transition-colors ${
-              index === activeIndex
+              isActive(item.href)
                 ? "text-[var(--color-brand-hover)]"
                 : "text-gray-600"
             }`}

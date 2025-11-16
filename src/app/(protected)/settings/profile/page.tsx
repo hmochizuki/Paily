@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/features/auth/actions/logout";
 import { requireUser } from "@/lib/auth";
@@ -12,11 +13,18 @@ export default async function ProfileSettingsPage() {
 
   const profile = await prisma.profile.findUnique({
     where: { id: user.id },
+    include: {
+      couples: {
+        select: { coupleId: true },
+      },
+    },
   });
 
   if (!profile) {
     redirect("/");
   }
+
+  const hasCouple = profile.couples && profile.couples.length > 0;
 
   return (
     <div className="space-y-6 px-4 py-10">
@@ -78,6 +86,23 @@ export default async function ProfileSettingsPage() {
             )}
           </dl>
         </div>
+
+        {!hasCouple && (
+          <div className="rounded-lg border border-dashed border-[var(--color-brand)] bg-pink-50 p-6">
+            <h2 className="mb-2 text-lg font-semibold text-[var(--color-text-default)]">
+              共有スペースを作成
+            </h2>
+            <p className="mb-4 text-sm text-[var(--color-text-muted)]">
+              パートナーと共有リストやカレンダーを使うには、共有スペースを作成してください。
+            </p>
+            <Link
+              href="/couple/create"
+              className="inline-block rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] transition-colors hover:bg-[var(--color-brand-hover)]"
+            >
+              スペースを作成
+            </Link>
+          </div>
+        )}
 
         <form action={logoutAction}>
           <button

@@ -34,7 +34,7 @@ export default async function ListDetailPage({ params }: ListDetailPageProps) {
   });
 
   if (!couplePartner) {
-    redirect("/couple/create");
+    redirect("/lists");
   }
 
   const list = await prisma.shoppingList.findUnique({
