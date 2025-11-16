@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { deleteEventAction } from "../actions/deleteEvent";
+import { updateEventAction } from "../actions/updateEvent";
 
 interface EventDetailModalProps {
   event: {
@@ -40,6 +41,16 @@ const COLOR_CLASSES: Record<string, string> = {
   purple: "bg-purple-400",
 };
 
+const EVENT_COLORS = [
+  { value: "pink", label: "ピンク", class: "bg-pink-400" },
+  { value: "red", label: "レッド", class: "bg-red-400" },
+  { value: "orange", label: "オレンジ", class: "bg-orange-400" },
+  { value: "yellow", label: "イエロー", class: "bg-yellow-400" },
+  { value: "green", label: "グリーン", class: "bg-green-400" },
+  { value: "blue", label: "ブルー", class: "bg-blue-400" },
+  { value: "purple", label: "パープル", class: "bg-purple-400" },
+];
+
 function formatDateTime(dateString: string, isAllDay: boolean): string {
   const date = new Date(dateString);
   const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
@@ -56,9 +67,27 @@ function formatDateTime(dateString: string, isAllDay: boolean): string {
   return `${dateStr} ${timeStr}`;
 }
 
+function formatDateForInput(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatTimeForInput(dateString: string): string {
+  const date = new Date(dateString);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
 export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editColor, setEditColor] = useState(event.color ?? "pink");
+  const [editIsAllDay, setEditIsAllDay] = useState(event.isAllDay);
 
   const handleDelete = () => {
     if (confirm("このイベントを削除しますか？")) {
@@ -69,6 +98,194 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
       });
     }
   };
+
+  const handleUpdate = (formData: FormData) => {
+    startTransition(async () => {
+      await updateEventAction(formData);
+      router.refresh();
+      onClose();
+    });
+  };
+
+  if (isEditing) {
+    return (
+      <div className="fixed inset-0 z-[var(--z-index-modal-backdrop)] flex items-center justify-center bg-black/50">
+        <div className="z-[var(--z-index-modal)] max-h-[90vh] w-[90%] max-w-md overflow-y-auto rounded-lg bg-white p-6">
+          <h2 className="mb-4 text-lg font-semibold text-[var(--color-text-default)]">
+            イベントを編集
+          </h2>
+          <form action={handleUpdate} className="space-y-4">
+            <input type="hidden" name="eventId" value={event.id} />
+            <input
+              type="hidden"
+              name="isAllDay"
+              value={editIsAllDay.toString()}
+            />
+            <input type="hidden" name="color" value={editColor} />
+
+            <div>
+              <label
+                htmlFor="edit-title"
+                className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+              >
+                タイトル
+              </label>
+              <input
+                id="edit-title"
+                name="title"
+                type="text"
+                defaultValue={event.title}
+                className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="edit-description"
+                className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+              >
+                メモ
+              </label>
+              <textarea
+                id="edit-description"
+                name="description"
+                defaultValue={event.description ?? ""}
+                rows={3}
+                className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="edit-isAllDay"
+                type="checkbox"
+                checked={editIsAllDay}
+                onChange={(e) => setEditIsAllDay(e.target.checked)}
+                className="size-4 rounded border-[var(--color-border-default)]"
+              />
+              <label
+                htmlFor="edit-isAllDay"
+                className="text-sm text-[var(--color-text-default)]"
+              >
+                終日
+              </label>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="edit-startDate"
+                  className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+                >
+                  開始日
+                </label>
+                <input
+                  id="edit-startDate"
+                  name="startDate"
+                  type="date"
+                  defaultValue={formatDateForInput(event.startAt)}
+                  className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+                  required
+                />
+              </div>
+              {!editIsAllDay && (
+                <div>
+                  <label
+                    htmlFor="edit-startTime"
+                    className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+                  >
+                    開始時間
+                  </label>
+                  <input
+                    id="edit-startTime"
+                    name="startTime"
+                    type="time"
+                    defaultValue={formatTimeForInput(event.startAt)}
+                    className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="edit-endDate"
+                  className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+                >
+                  終了日
+                </label>
+                <input
+                  id="edit-endDate"
+                  name="endDate"
+                  type="date"
+                  defaultValue={
+                    event.endAt ? formatDateForInput(event.endAt) : ""
+                  }
+                  className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+                />
+              </div>
+              {!editIsAllDay && (
+                <div>
+                  <label
+                    htmlFor="edit-endTime"
+                    className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+                  >
+                    終了時間
+                  </label>
+                  <input
+                    id="edit-endTime"
+                    name="endTime"
+                    type="time"
+                    defaultValue={
+                      event.endAt ? formatTimeForInput(event.endAt) : ""
+                    }
+                    className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <span className="mb-2 block text-sm font-medium text-[var(--color-text-default)]">
+                カラー
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {EVENT_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setEditColor(c.value)}
+                    className={`size-8 rounded-full ${c.class} ${editColor === c.value ? "ring-2 ring-[var(--color-text-default)] ring-offset-2" : ""}`}
+                    aria-label={c.label}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="rounded-lg border border-[var(--color-border-default)] px-4 py-2 text-sm font-medium text-[var(--color-text-default)] transition-colors hover:bg-[var(--color-bg-subtle)]"
+                disabled={isPending}
+              >
+                キャンセル
+              </button>
+              <button
+                type="submit"
+                className="rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] transition-colors hover:bg-[var(--color-brand-hover)] disabled:opacity-50"
+                disabled={isPending}
+              >
+                {isPending ? "保存中..." : "保存"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[var(--z-index-modal-backdrop)] flex items-center justify-center bg-black/50">
@@ -171,6 +388,13 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
             className="rounded-lg border border-[var(--color-danger)] px-4 py-2 text-sm font-medium text-[var(--color-danger)] transition-colors hover:bg-red-50 disabled:opacity-50"
           >
             {isPending ? "削除中..." : "削除"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="rounded-lg border border-[var(--color-border-default)] px-4 py-2 text-sm font-medium text-[var(--color-text-default)] transition-colors hover:bg-[var(--color-bg-subtle)]"
+          >
+            編集
           </button>
           <button
             type="button"
