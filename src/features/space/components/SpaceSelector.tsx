@@ -64,32 +64,63 @@ export function SpaceSelector({ spaces, currentUserId }: SpaceSelectorProps) {
         </p>
       ) : (
         <div className="space-y-2">
-          {spaces.map((space) => (
-            <button
-              key={space.id}
-              type="button"
-              onClick={() => selectSpace(space.id)}
-              className={`w-full rounded-lg border p-3 text-left transition-colors ${
-                selectedSpaceId === space.id
-                  ? "border-[var(--color-brand)] bg-pink-50"
-                  : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-[var(--color-text-default)]">
-                  {getSpaceLabel(space)}
-                </span>
-                {selectedSpaceId === space.id && (
-                  <span className="text-xs font-medium text-[var(--color-brand)]">
-                    選択中
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-                作成日: {new Date(space.createdAt).toLocaleDateString("ja-JP")}
-              </p>
-            </button>
-          ))}
+          {spaces.map((space) => {
+            const isSelected = selectedSpaceId === space.id;
+            return (
+              <button
+                key={space.id}
+                type="button"
+                onClick={() => {
+                  selectSpace(space.id);
+                }}
+                className={`w-full cursor-pointer rounded-lg border p-3 text-left transition-all active:scale-[0.98] ${
+                  isSelected
+                    ? "border-[var(--color-brand)] bg-pink-50 ring-2 ring-[var(--color-brand)]"
+                    : "border-[var(--color-border-default)] hover:border-[var(--color-brand)] hover:bg-pink-50/50"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`size-4 rounded-full border-2 ${
+                        isSelected
+                          ? "border-[var(--color-brand)] bg-[var(--color-brand)]"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      {isSelected && (
+                        <svg
+                          className="size-full text-white"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M4 8l3 3 5-6"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="font-medium text-[var(--color-text-default)]">
+                      {getSpaceLabel(space)}
+                    </span>
+                  </div>
+                  {isSelected && (
+                    <span className="rounded-full bg-[var(--color-brand)] px-2 py-0.5 text-xs font-medium text-white">
+                      使用中
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 pl-6 text-xs text-[var(--color-text-muted)]">
+                  作成日: {new Date(space.createdAt).toLocaleDateString("ja-JP")}
+                </p>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
