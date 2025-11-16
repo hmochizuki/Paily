@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { EventCard } from "./EventCard";
+import { EventDetailModal } from "./EventDetailModal";
 import { EventFormModal } from "./EventFormModal";
 
 interface CalendarEvent {
@@ -82,6 +83,7 @@ export function CalendarView({ events, coupleId }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [modalDate, setModalDate] = useState<Date | null>(null);
+  const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -261,7 +263,11 @@ export function CalendarView({ events, coupleId }: CalendarViewProps) {
           ) : (
             <div className="space-y-2">
               {selectedDateEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  onClick={() => setDetailEvent(event)}
+                />
               ))}
             </div>
           )}
@@ -273,6 +279,13 @@ export function CalendarView({ events, coupleId }: CalendarViewProps) {
           coupleId={coupleId}
           initialDate={modalDate}
           onClose={() => setModalDate(null)}
+        />
+      )}
+
+      {detailEvent && (
+        <EventDetailModal
+          event={detailEvent}
+          onClose={() => setDetailEvent(null)}
         />
       )}
     </div>
