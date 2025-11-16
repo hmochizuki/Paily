@@ -23,6 +23,7 @@ model Profile {
   invitesAccepted    PartnerInvite[]         @relation("InviteAccepted")
   shoppingListItems  ShoppingListItem[]      @relation("ItemAddedBy")
   shoppingItemStates ShoppingListItemState[] @relation("ItemStateCheckedBy")
+  calendarEvents     CalendarEvent[]         @relation("EventCreatedBy")
 
   @@map("profiles")
 }
@@ -32,11 +33,12 @@ model Couple {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
-  partners CouplePartner[]
-  invites  PartnerInvite[]
-  lists    ShoppingList[]
-  items    ShoppingListItem[]
-  states   ShoppingListItemState[]
+  partners       CouplePartner[]
+  invites        PartnerInvite[]
+  lists          ShoppingList[]
+  items          ShoppingListItem[]
+  states         ShoppingListItemState[]
+  calendarEvents CalendarEvent[]
 
   @@map("couples")
 }
@@ -125,4 +127,24 @@ model ShoppingListItemState {
   @@index([isChecked])
   @@index([coupleId, isChecked])
   @@map("shopping_list_item_states")
+}
+
+model CalendarEvent {
+  id          String    @id @db.Uuid
+  coupleId    String    @map("couple_id") @db.Uuid
+  createdById String    @map("created_by") @db.Uuid
+  title       String
+  description String?
+  startAt     DateTime  @map("start_at") @db.Timestamptz(6)
+  endAt       DateTime? @map("end_at") @db.Timestamptz(6)
+  isAllDay    Boolean   @default(false) @map("is_all_day")
+  color       String?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  couple    Couple  @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  createdBy Profile @relation("EventCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([coupleId, startAt])
+  @@map("calendar_events")
 }
