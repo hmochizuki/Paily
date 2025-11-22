@@ -12,9 +12,7 @@ interface ListData {
   coupleId: string;
   isActive: boolean;
   updatedAt: string;
-  _count: {
-    items: number;
-  };
+  uncheckedItemCount: number;
 }
 
 interface ListsPageContentProps {
@@ -75,7 +73,7 @@ export function ListsPageContent({
                       {list.title}
                     </h2>
                     <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                      {list._count.items} アイテム
+                      未完了 {list.uncheckedItemCount} 件
                     </p>
                   </div>
                   <div className="text-right">

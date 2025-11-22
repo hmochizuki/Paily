@@ -8,9 +8,7 @@ export type ListOverview = {
   coupleId: string;
   isActive: boolean;
   updatedAt: string;
-  _count: {
-    items: number;
-  };
+  uncheckedItemCount: number;
 };
 
 export type ListsData = {
@@ -34,8 +32,12 @@ async function fetchListsData(userId: string): Promise<ListsData> {
     where: { coupleId: { in: userSpaceIds } },
     orderBy: { updatedAt: "desc" },
     include: {
-      _count: {
-        select: { items: true },
+      items: {
+        select: {
+          state: {
+            select: { isChecked: true },
+          },
+        },
       },
     },
   });
@@ -46,7 +48,9 @@ async function fetchListsData(userId: string): Promise<ListsData> {
     coupleId: list.coupleId,
     isActive: list.isActive,
     updatedAt: list.updatedAt.toISOString(),
-    _count: list._count,
+    uncheckedItemCount: list.items.reduce((count, item) => {
+      return count + (item.state?.isChecked ? 0 : 1);
+    }, 0),
   }));
 
   return { userSpaceIds, lists: serialized };
