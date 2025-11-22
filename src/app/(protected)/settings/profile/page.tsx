@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import { logoutAction } from "@/features/auth/actions/logout";
 import { EditDisplayNameForm } from "@/features/profile/components/EditDisplayNameForm";
 import { SpaceSelector } from "@/features/space/components/SpaceSelector";
@@ -31,20 +32,37 @@ export default function ProfileSettingsPage() {
   );
 }
 
-async function ProfileSettingsContent() {
-  const user = await requireUser();
+type ProfileSettingsData = {
+  profile: {
+    displayName: string;
+    gender: string | null;
+    avatarUrl: string | null;
+  } | null;
+  spaces: Array<{
+    id: string;
+    createdAt: string;
+    partners: Array<{
+      profile: {
+        displayName: string;
+      };
+    }>;
+  }>;
+};
 
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id },
-    include: {
-      couples: {
-        include: {
-          couple: {
-            include: {
-              partners: {
-                include: {
-                  profile: {
-                    select: { displayName: true },
+const getProfileSettingsData = unstable_cache(
+  async (userId: string): Promise<ProfileSettingsData> => {
+    const profile = await prisma.profile.findUnique({
+      where: { id: userId },
+      include: {
+        couples: {
+          include: {
+            couple: {
+              include: {
+                partners: {
+                  include: {
+                    profile: {
+                      select: { displayName: true },
+                    },
                   },
                 },
               },
@@ -52,24 +70,44 @@ async function ProfileSettingsContent() {
           },
         },
       },
-    },
-  });
+    });
 
-  if (!profile) {
+    if (!profile) {
+      return { profile: null, spaces: [] };
+    }
+
+    const spaces = profile.couples.map((cp) => ({
+      id: cp.couple.id,
+      createdAt: cp.couple.createdAt.toISOString(),
+      partners: cp.couple.partners.map((p) => ({
+        profile: {
+          displayName: p.profile.displayName,
+        },
+      })),
+    }));
+
+    return {
+      profile: {
+        displayName: profile.displayName,
+        gender: profile.gender,
+        avatarUrl: profile.avatarUrl,
+      },
+      spaces,
+    };
+  },
+  ["profile-settings-data"],
+  { revalidate: 60 },
+);
+
+async function ProfileSettingsContent() {
+  const user = await requireUser();
+  const cached = await getProfileSettingsData(user.id);
+
+  if (!cached.profile) {
     redirect("/");
   }
 
-  const spaces = profile.couples.map((cp) => ({
-    id: cp.couple.id,
-    createdAt: cp.couple.createdAt.toISOString(),
-    partners: cp.couple.partners.map((p) => ({
-      profile: {
-        displayName: p.profile.displayName,
-      },
-    })),
-  }));
-
-  const hasCouple = spaces.length > 0;
+  const hasCouple = cached.spaces.length > 0;
 
   return (
     <div className="space-y-4">
@@ -83,16 +121,16 @@ async function ProfileSettingsContent() {
               表示名
             </dt>
             <dd className="mt-1">
-              <EditDisplayNameForm currentName={profile.displayName} />
+              <EditDisplayNameForm currentName={cached.profile.displayName} />
             </dd>
           </div>
-          {profile.gender && (
+          {cached.profile.gender && (
             <div>
               <dt className="text-sm font-medium text-[var(--color-text-muted)]">
                 性別
               </dt>
               <dd className="mt-1 text-base text-[var(--color-text-default)]">
-                {profile.gender}
+                {cached.profile.gender}
               </dd>
             </div>
           )}
@@ -104,7 +142,7 @@ async function ProfileSettingsContent() {
               {user.email}
             </dd>
           </div>
-          {profile.avatarUrl && (
+          {cached.profile.avatarUrl && (
             <div>
               <dt className="text-sm font-medium text-[var(--color-text-muted)]">
                 アイコン
@@ -112,9 +150,9 @@ async function ProfileSettingsContent() {
               <dd className="mt-2">
                 <div
                   className="size-16 rounded-full bg-cover bg-center"
-                  style={{ backgroundImage: `url(${profile.avatarUrl})` }}
+                  style={{ backgroundImage: `url(${cached.profile.avatarUrl})` }}
                   role="img"
-                  aria-label={profile.displayName}
+                  aria-label={cached.profile.displayName}
                 />
               </dd>
             </div>
@@ -123,7 +161,10 @@ async function ProfileSettingsContent() {
       </div>
 
       {hasCouple ? (
-        <SpaceSelector spaces={spaces} currentUserId={profile.displayName} />
+        <SpaceSelector
+          spaces={cached.spaces}
+          currentUserId={cached.profile.displayName}
+        />
       ) : (
         <div className="rounded-lg border border-dashed border-[var(--color-brand)] bg-pink-50 p-6">
           <h2 className="mb-2 text-lg font-semibold text-[var(--color-text-default)]">

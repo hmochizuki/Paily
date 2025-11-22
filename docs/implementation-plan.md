@@ -124,5 +124,6 @@ src/
 3. **DB インデックスとキャッシュ**
    - `calendar_events` テーブルに `(couple_id, start_at)` 複合インデックスを追加し、時間範囲＋スペースID検索を高速化。
    - `/calendar` のイベント一覧は `unstable_cache`（`revalidate: 60`）でサーバーキャッシュし、同一ユーザー/スペースへの連続アクセスで再クエリを避ける。変更時は `router.refresh()` で無効化される前提。
+   - `/lists` と `/settings/profile` も `unstable_cache` で 60 秒キャッシュし、同一ユーザーの連続アクセス時に Prisma クエリを共通化する。リスト作成／プロフィール更新後は `router.refresh()` で再取得する。
 4. **段階的改善と検証**
    - 上記を1つずつ適用し、LightHouse/リアルユーザー計測で4秒→1秒台を目標に効果を記録。効果が薄ければリクエスト再利用（`Promise.all` 化）や Edge Functions へのオフロードを検討する。
