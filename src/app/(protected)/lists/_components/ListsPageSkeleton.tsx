@@ -1,4 +1,7 @@
-const LIST_SKELETON_IDS = Array.from({ length: 3 }, (_, index) => `list-skeleton-${index}`);
+const LIST_SKELETON_IDS = Array.from(
+  { length: 3 },
+  (_, index) => `list-skeleton-${index}`,
+);
 
 export function ListsPageSkeleton() {
   return (

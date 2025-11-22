@@ -95,7 +95,10 @@ async function ProfileSettingsContent() {
       </div>
 
       {hasCouple ? (
-        <SpaceSelector spaces={cached.spaces} currentUserId={profile.displayName} />
+        <SpaceSelector
+          spaces={cached.spaces}
+          currentUserId={profile.displayName}
+        />
       ) : (
         <div className="rounded-lg border border-dashed border-[var(--color-brand)] bg-pink-50 p-6">
           <h2 className="mb-2 text-lg font-semibold text-[var(--color-text-default)]">

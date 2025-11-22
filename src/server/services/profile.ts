@@ -67,11 +67,13 @@ async function fetchProfileSettingsData(
   };
 }
 
-const profileSettingsCache = unstable_cache(fetchProfileSettingsData, [
-  "profile-settings",
-], {
-  revalidate: CACHE_TTL_SECONDS,
-});
+const profileSettingsCache = unstable_cache(
+  fetchProfileSettingsData,
+  ["profile-settings"],
+  {
+    revalidate: CACHE_TTL_SECONDS,
+  },
+);
 
 export async function getProfileSettingsData(userId: string) {
   return profileSettingsCache(userId);

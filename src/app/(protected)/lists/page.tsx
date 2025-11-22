@@ -1,5 +1,5 @@
-import { Suspense } from "react";
 import Link from "next/link";
+import { Suspense } from "react";
 import { ListsPageContent } from "@/features/shopping-list/components/ListsPageContent";
 import { requireUser } from "@/lib/auth";
 import { getListsData } from "@/server/services/lists";

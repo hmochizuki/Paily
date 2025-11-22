@@ -13,7 +13,10 @@ export function CalendarPageSkeleton() {
       </div>
       <div className="grid flex-1 grid-cols-7 gap-2">
         {PLACEHOLDER_CELL_IDS.map((cellId) => (
-          <div key={cellId} className="h-12 animate-pulse rounded bg-gray-200" />
+          <div
+            key={cellId}
+            className="h-12 animate-pulse rounded bg-gray-200"
+          />
         ))}
       </div>
     </div>
