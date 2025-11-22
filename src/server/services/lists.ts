@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import type { ShoppingListItemViewModel } from "@/features/shopping-list/types";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
 
@@ -66,4 +67,99 @@ export async function getListsData(userId: string) {
 
 export async function getListsDataFresh(userId: string) {
   return fetchListsData(userId);
+}
+
+export type ListDetailData = {
+  listId: string;
+  coupleId: string;
+  items: ShoppingListItemViewModel[];
+  currentUserDisplayName: string;
+};
+
+async function fetchListDetailData(
+  userId: string,
+  listId: string,
+): Promise<ListDetailData | null> {
+  const profilePromise = prisma.profile.findUnique({
+    where: { id: userId },
+    select: { displayName: true },
+  });
+
+  const couplePartnerPromise = prisma.couplePartner.findFirst({
+    where: { profileId: userId },
+    select: { coupleId: true },
+  });
+
+  const [profile, couplePartner] = await Promise.all([
+    profilePromise,
+    couplePartnerPromise,
+  ]);
+
+  if (!couplePartner) {
+    return null;
+  }
+
+  const list = await prisma.shoppingList.findUnique({
+    where: {
+      id: listId,
+      coupleId: couplePartner.coupleId,
+    },
+    include: {
+      items: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          state: true,
+          addedBy: {
+            select: { displayName: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!list) {
+    return null;
+  }
+
+  const items: ShoppingListItemViewModel[] = list.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    note: item.note,
+    quantity: item.quantity,
+    createdAt: item.createdAt,
+    addedBy: {
+      displayName: item.addedBy?.displayName ?? "メンバー",
+    },
+    state: item.state
+      ? {
+          isChecked: item.state.isChecked,
+          checkedAt: item.state.checkedAt,
+        }
+      : null,
+  }));
+
+  const currentUserDisplayName = profile?.displayName ?? "あなた";
+
+  return {
+    listId: list.id,
+    coupleId: list.coupleId,
+    items,
+    currentUserDisplayName,
+  };
+}
+
+const listDetailDataCache = unstable_cache(
+  fetchListDetailData,
+  ["list-detail-data"],
+  {
+    revalidate: CACHE_TTL_SECONDS,
+  },
+);
+
+export async function getListDetailData(userId: string, listId: string) {
+  return listDetailDataCache(userId, listId);
+}
+
+export async function getListDetailDataFresh(userId: string, listId: string) {
+  return fetchListDetailData(userId, listId);
 }

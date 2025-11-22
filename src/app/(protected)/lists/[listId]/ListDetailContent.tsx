@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { ShoppingListDetailClient } from "@/features/shopping-list/components/ShoppingListDetailClient";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getListDetailData } from "@/server/services/lists";
 
 type ListDetailContentProps = {
   listId: string;
@@ -10,11 +11,6 @@ type ListDetailContentProps = {
 
 export async function ListDetailContent({ listId }: ListDetailContentProps) {
   const user = await requireUser();
-
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id },
-    select: { displayName: true },
-  });
 
   const couplePartner = await prisma.couplePartner.findFirst({
     where: { profileId: user.id },
@@ -25,36 +21,19 @@ export async function ListDetailContent({ listId }: ListDetailContentProps) {
     redirect("/lists");
   }
 
-  const list = await prisma.shoppingList.findUnique({
-    where: {
-      id: listId,
-      coupleId: couplePartner.coupleId,
-    },
-    include: {
-      items: {
-        orderBy: { createdAt: "asc" },
-        include: {
-          state: true,
-          addedBy: {
-            select: { displayName: true },
-          },
-        },
-      },
-    },
-  });
+  const cached = await getListDetailData(user.id, listId);
 
-  if (!list) {
+  if (!cached) {
     notFound();
   }
 
-  const currentUserDisplayName = profile?.displayName ?? user.email ?? "あなた";
   return (
     <div className="space-y-6">
       <ShoppingListDetailClient
-        listId={list.id}
-        coupleId={list.coupleId}
-        initialItems={list.items}
-        currentUserDisplayName={currentUserDisplayName}
+        listId={cached.listId}
+        coupleId={cached.coupleId}
+        initialItems={cached.items}
+        currentUserDisplayName={cached.currentUserDisplayName}
       />
     </div>
   );
