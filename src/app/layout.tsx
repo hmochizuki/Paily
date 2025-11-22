@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
+import { SplashScreenGate } from "@/common/SplashScreenGate";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,12 +33,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const splashCookie = cookies().get("paily_splash_seen")?.value === "true";
+
   return (
     <html lang="ja">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <SplashScreenGate hasSeenSplash={splashCookie}>
+          {children}
+        </SplashScreenGate>
       </body>
     </html>
   );
