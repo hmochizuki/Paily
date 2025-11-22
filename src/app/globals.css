@@ -76,6 +76,7 @@
   --z-index-header: 100;
   --z-index-bottom-nav: 100;
   --z-index-notification: 200;
+  --z-index-splash: 400;
 }
 
 /* ベース */
@@ -97,4 +98,173 @@ body {
 /* input, textarea, select は各コンポーネントでカスタムスタイルを適用 */
 :where(input, textarea, select) {
   outline: none;
+}
+
+@layer components {
+  .animated-logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ffffff 0%,
+      var(--color-brand) 55%,
+      var(--color-brand-hover) 100%
+    );
+    box-shadow:
+      0 12px 25px rgb(67 46 54 / 0.25),
+      inset 0 0 20px rgb(255 255 255 / 0.4);
+    overflow: visible;
+  }
+
+  .animated-logo__glow {
+    position: absolute;
+    inset: -12%;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle,
+      rgb(255 255 255 / 0.55) 0%,
+      rgb(255 155 195 / 0.2) 45%,
+      transparent 70%
+    );
+    filter: blur(18px);
+    opacity: 0.55;
+    animation: animated-logo-glow 9s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  .animated-logo__icon {
+    width: 70%;
+    height: 70%;
+    animation: animated-logo-float 4.5s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .splash-screen {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: var(--spacing-8);
+    background: radial-gradient(
+      circle at top,
+      rgb(255 255 255 / 0.85),
+      var(--color-bg-default)
+    );
+    z-index: var(--z-index-splash);
+    transition:
+      opacity 0.6s ease,
+      visibility 0.6s ease;
+  }
+
+  .splash-screen[data-hidden="true"] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .splash-screen__backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 50% 30%,
+      rgb(255 255 255 / 0.9),
+      rgb(255 201 222 / 0.6),
+      var(--color-bg-default)
+    );
+    filter: blur(12px);
+    animation: splash-backdrop-pulse 8s ease-in-out infinite;
+  }
+
+  .splash-screen__panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-8);
+    border-radius: var(--radius-3);
+    background: rgb(255 255 255 / 0.6);
+    box-shadow: 0 25px 45px rgb(67 46 54 / 0.18);
+    backdrop-filter: blur(22px);
+    text-align: center;
+    width: 280px;
+    height: 280px;
+  }
+
+  .splash-screen__message {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .splash-screen__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .splash-screen__subtitle {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+  }
+}
+
+@keyframes animated-logo-float {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-6px) scale(1.03);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes animated-logo-glow {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.07);
+  }
+  100% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes splash-backdrop-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-logo__glow,
+  .animated-logo__icon {
+    animation: none;
+  }
+
+  .splash-screen {
+    transition: none;
+  }
+
+  .splash-screen__backdrop {
+    animation: none;
+  }
 }
