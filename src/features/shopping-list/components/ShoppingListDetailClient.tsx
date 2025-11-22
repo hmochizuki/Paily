@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useOptimistic, useRef } from "react";
+import { startTransition, useEffect, useOptimistic, useRef } from "react";
 import { addItemAction } from "../actions/addItem";
 import { deleteItemAction } from "../actions/deleteItem";
 import { toggleItemCheckAction } from "../actions/toggleItemCheck";
@@ -68,7 +68,9 @@ export function ShoppingListDetailClient({
 
   useEffect(() => {
     serverSnapshotRef.current = initialItems;
-    dispatchOptimistic({ type: "replace", items: initialItems });
+    startTransition(() => {
+      dispatchOptimistic({ type: "replace", items: initialItems });
+    });
   }, [initialItems, dispatchOptimistic]);
 
   const refreshAfterMutation = () => {

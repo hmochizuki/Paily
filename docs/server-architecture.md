@@ -67,6 +67,8 @@ export async function createCoupleInvitationHandler(
 - ドメインルールの適用
 - トランザクション境界の管理
 
+現在は `calendar.ts` / `lists.ts` / `profile.ts` を追加済みで、App Router の `page.tsx` や将来の REST API から共通関数（`getCalendarData` など）を呼び出している。これらの関数は `unstable_cache` を内部実装に隠蔽しており、UI 層は `userId` だけを渡せば同じ ViewModel を取得できる。
+
 **実装例:**
 ```typescript
 // src/server/services/couple/couple.service.ts

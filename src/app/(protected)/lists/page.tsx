@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 import { ListsPageContent } from "@/features/shopping-list/components/ListsPageContent";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getListsData } from "@/server/services/lists";
 import { ListsPageSkeleton } from "./_components/ListsPageSkeleton";
 
 export const metadata = {
@@ -28,58 +27,6 @@ export default function ListsPage() {
     </div>
   );
 }
-
-type ListsData = {
-  userSpaceIds: string[];
-  lists: Array<{
-    id: string;
-    title: string;
-    coupleId: string;
-    isActive: boolean;
-    updatedAt: string;
-    _count: {
-      items: number;
-    };
-  }>;
-};
-
-const getListsData = unstable_cache(
-  async (userId: string): Promise<ListsData> => {
-    const couplePartners = await prisma.couplePartner.findMany({
-      where: { profileId: userId },
-      select: { coupleId: true },
-    });
-
-    if (couplePartners.length === 0) {
-      return { userSpaceIds: [], lists: [] };
-    }
-
-    const userSpaceIds = couplePartners.map((cp) => cp.coupleId);
-
-    const lists = await prisma.shoppingList.findMany({
-      where: { coupleId: { in: userSpaceIds } },
-      orderBy: { updatedAt: "desc" },
-      include: {
-        _count: {
-          select: { items: true },
-        },
-      },
-    });
-
-    const serializedLists = lists.map((list) => ({
-      id: list.id,
-      title: list.title,
-      coupleId: list.coupleId,
-      isActive: list.isActive,
-      updatedAt: list.updatedAt.toISOString(),
-      _count: list._count,
-    }));
-
-    return { userSpaceIds, lists: serializedLists };
-  },
-  ["lists-page-data"],
-  { revalidate: 60 },
-);
 
 async function ListsDataSection() {
   const user = await requireUser();
