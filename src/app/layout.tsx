@@ -16,13 +16,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Paily",
   description: "Couple task coordination app",
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Paily",
+    statusBarStyle: "default",
+  },
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon.ico" },
+      { url: "/icons/icon-192.png", sizes: "192x192" },
     ],
     apple: {
-      url: "/favicon.svg",
+      url: "/icons/icon-192.png",
     },
   },
 };
