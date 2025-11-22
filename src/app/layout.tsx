@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SplashScreenGate } from "@/common/SplashScreenGate";
+import { SplashScreenGate } from "@/common/ui/layout/SplashScreenGate/SplashScreenGate";
 import "./globals.css";
 
 const geistSans = Geist({

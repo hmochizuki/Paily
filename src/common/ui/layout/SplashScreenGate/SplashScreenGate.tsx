@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { AnimatedLogo } from "@/common/AnimatedLogo";
+import { AnimatedLogo } from "@/common/ui/layout/SplashScreenGate/AnimatedLogo";
 
 const FADE_OUT_DURATION_MS = 600;
 const READY_FALLBACK_MS = 4500;
