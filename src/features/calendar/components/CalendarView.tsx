@@ -1,26 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import type { CalendarEventViewModel } from "../types";
 import { EventCard } from "./EventCard";
 import { EventDetailModal } from "./EventDetailModal";
 import { EventFormModal } from "./EventFormModal";
 
-interface CalendarEvent {
-  id: string;
-  title: string;
-  description: string | null;
-  startAt: string;
-  endAt: string | null;
-  isAllDay: boolean;
-  color: string | null;
-  createdBy: {
-    displayName: string;
-  };
-}
-
 interface CalendarViewProps {
-  events: CalendarEvent[];
+  events: CalendarEventViewModel[];
   coupleId: string;
+  onCreateEvent: (formData: FormData) => Promise<void>;
+  onUpdateEvent: (formData: FormData) => Promise<void>;
+  onDeleteEvent: (eventId: string) => Promise<void>;
 }
 
 function getDaysInMonth(year: number, month: number): Date[] {
@@ -54,7 +45,7 @@ function isSameDay(date1: Date, date2: Date): boolean {
   );
 }
 
-function isEventOnDate(event: CalendarEvent, date: Date): boolean {
+function isEventOnDate(event: CalendarEventViewModel, date: Date): boolean {
   const eventStart = new Date(event.startAt);
   eventStart.setHours(0, 0, 0, 0);
 
@@ -79,11 +70,19 @@ const COLOR_CLASSES: Record<string, string> = {
   purple: "bg-purple-400",
 };
 
-export function CalendarView({ events, coupleId }: CalendarViewProps) {
+export function CalendarView({
+  events,
+  coupleId,
+  onCreateEvent,
+  onUpdateEvent,
+  onDeleteEvent,
+}: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [modalDate, setModalDate] = useState<Date | null>(null);
-  const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
+  const [detailEvent, setDetailEvent] = useState<CalendarEventViewModel | null>(
+    null,
+  );
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -232,7 +231,7 @@ export function CalendarView({ events, coupleId }: CalendarViewProps) {
                     {dayEvents.slice(0, 2).map((event) => (
                       <div
                         key={event.id}
-                        className={`truncate rounded px-1 text-[10px] text-white ${COLOR_CLASSES[event.color ?? "pink"] ?? "bg-pink-400"}`}
+                        className={`truncate rounded px-1 text-[10px] text-white ${COLOR_CLASSES[event.color ?? "pink"] ?? "bg-pink-400"} ${event.isOptimistic ? "opacity-70" : "opacity-100"}`}
                       >
                         {event.title}
                       </div>
@@ -279,6 +278,9 @@ export function CalendarView({ events, coupleId }: CalendarViewProps) {
           coupleId={coupleId}
           initialDate={modalDate}
           onClose={() => setModalDate(null)}
+          onSubmit={async (formData) => {
+            await onCreateEvent(formData);
+          }}
         />
       )}
 
@@ -286,6 +288,8 @@ export function CalendarView({ events, coupleId }: CalendarViewProps) {
         <EventDetailModal
           event={detailEvent}
           onClose={() => setDetailEvent(null)}
+          onUpdate={onUpdateEvent}
+          onDelete={onDeleteEvent}
         />
       )}
     </div>

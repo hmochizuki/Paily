@@ -4,21 +4,16 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteEventAction } from "../actions/deleteEvent";
 import { updateEventAction } from "../actions/updateEvent";
+import type { CalendarEventViewModel } from "../types";
+
+type EventUpdateHandler = (formData: FormData) => Promise<void>;
+type EventDeleteHandler = (eventId: string) => Promise<void>;
 
 interface EventDetailModalProps {
-  event: {
-    id: string;
-    title: string;
-    description: string | null;
-    startAt: string;
-    endAt: string | null;
-    isAllDay: boolean;
-    color: string | null;
-    createdBy: {
-      displayName: string;
-    };
-  };
+  event: CalendarEventViewModel;
   onClose: () => void;
+  onUpdate?: EventUpdateHandler;
+  onDelete?: EventDeleteHandler;
 }
 
 const COLOR_LABELS: Record<string, string> = {
@@ -82,18 +77,34 @@ function formatTimeForInput(dateString: string): string {
   return `${hours}:${minutes}`;
 }
 
-export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
+export function EventDetailModal({
+  event,
+  onClose,
+  onUpdate,
+  onDelete,
+}: EventDetailModalProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);
   const [editColor, setEditColor] = useState(event.color ?? "pink");
   const [editIsAllDay, setEditIsAllDay] = useState(event.isAllDay);
+  const updateHandler =
+    onUpdate ??
+    (async (formData: FormData) => {
+      await updateEventAction(formData);
+      router.refresh();
+    });
+  const deleteHandler =
+    onDelete ??
+    (async (eventId: string) => {
+      await deleteEventAction(eventId);
+      router.refresh();
+    });
 
   const handleDelete = () => {
     if (confirm("このイベントを削除しますか？")) {
       startTransition(async () => {
-        await deleteEventAction(event.id);
-        router.refresh();
+        await deleteHandler(event.id);
         onClose();
       });
     }
@@ -101,8 +112,7 @@ export function EventDetailModal({ event, onClose }: EventDetailModalProps) {
 
   const handleUpdate = (formData: FormData) => {
     startTransition(async () => {
-      await updateEventAction(formData);
-      router.refresh();
+      await updateHandler(formData);
       onClose();
     });
   };

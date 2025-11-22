@@ -1,13 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { createEventAction } from "../actions/createEvent";
+
+type EventFormSubmitHandler = (formData: FormData) => Promise<void>;
 
 interface EventFormModalProps {
   coupleId: string;
   initialDate: Date;
   onClose: () => void;
+  onSubmit?: EventFormSubmitHandler;
 }
 
 function formatDateForInput(date: Date): string {
@@ -21,14 +23,14 @@ export function EventFormModal({
   coupleId,
   initialDate,
   onClose,
+  onSubmit,
 }: EventFormModalProps) {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const submitHandler = onSubmit ?? createEventAction;
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
-      await createEventAction(formData);
-      router.refresh();
+      await submitHandler(formData);
       onClose();
     });
   };

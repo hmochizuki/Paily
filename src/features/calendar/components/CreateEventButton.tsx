@@ -3,8 +3,11 @@
 import { useState, useTransition } from "react";
 import { createEventAction } from "../actions/createEvent";
 
+type CreateEventSubmitHandler = (formData: FormData) => Promise<void>;
+
 interface CreateEventButtonProps {
   coupleId: string;
+  onSubmit?: CreateEventSubmitHandler;
 }
 
 const EVENT_COLORS = [
@@ -17,7 +20,10 @@ const EVENT_COLORS = [
   { value: "purple", label: "パープル", class: "bg-purple-400" },
 ];
 
-export function CreateEventButton({ coupleId }: CreateEventButtonProps) {
+export function CreateEventButton({
+  coupleId,
+  onSubmit,
+}: CreateEventButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [title, setTitle] = useState("");
@@ -40,9 +46,11 @@ export function CreateEventButton({ coupleId }: CreateEventButtonProps) {
     setColor("pink");
   };
 
+  const submitHandler = onSubmit ?? createEventAction;
+
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
-      await createEventAction(formData);
+      await submitHandler(formData);
       setIsOpen(false);
       resetForm();
     });

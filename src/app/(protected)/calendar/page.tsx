@@ -9,6 +9,10 @@ export const metadata = {
 
 export default async function CalendarPage() {
   const user = await requireUser();
+  const profile = await prisma.profile.findUnique({
+    where: { id: user.id },
+    select: { displayName: true },
+  });
 
   const couplePartners = await prisma.couplePartner.findMany({
     where: { profileId: user.id },
@@ -68,6 +72,8 @@ export default async function CalendarPage() {
     createdBy: event.createdBy,
   }));
 
+  const currentUserDisplayName = profile?.displayName ?? user.email ?? "あなた";
+
   return (
     <div className="space-y-6 px-4 pt-4 pb-24">
       <div className="space-y-2">
@@ -79,7 +85,11 @@ export default async function CalendarPage() {
         </p>
       </div>
 
-      <CalendarPageContent allEvents={events} userSpaceIds={userSpaceIds} />
+      <CalendarPageContent
+        allEvents={events}
+        userSpaceIds={userSpaceIds}
+        currentUserDisplayName={currentUserDisplayName}
+      />
     </div>
   );
 }

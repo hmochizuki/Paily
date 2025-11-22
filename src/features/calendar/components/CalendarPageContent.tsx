@@ -2,31 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useSelectedSpace } from "@/hooks/useSelectedSpace";
-import { CalendarView } from "./CalendarView";
-import { CreateEventButton } from "./CreateEventButton";
-
-interface CalendarEvent {
-  id: string;
-  title: string;
-  description: string | null;
-  startAt: string;
-  endAt: string | null;
-  isAllDay: boolean;
-  color: string | null;
-  coupleId: string;
-  createdBy: {
-    displayName: string;
-  };
-}
+import type { CalendarEventViewModel } from "../types";
+import { CalendarClient } from "./CalendarClient";
 
 interface CalendarPageContentProps {
-  allEvents: CalendarEvent[];
+  allEvents: CalendarEventViewModel[];
   userSpaceIds: string[];
+  currentUserDisplayName: string;
 }
 
 export function CalendarPageContent({
   allEvents,
   userSpaceIds,
+  currentUserDisplayName,
 }: CalendarPageContentProps) {
   const { selectedSpaceId, selectSpace, isLoading } = useSelectedSpace();
   const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
@@ -58,9 +46,10 @@ export function CalendarPageContent({
   const events = allEvents.filter((event) => event.coupleId === currentSpaceId);
 
   return (
-    <>
-      <CalendarView events={events} coupleId={currentSpaceId} />
-      <CreateEventButton coupleId={currentSpaceId} />
-    </>
+    <CalendarClient
+      coupleId={currentSpaceId}
+      initialEvents={events}
+      currentUserDisplayName={currentUserDisplayName}
+    />
   );
 }

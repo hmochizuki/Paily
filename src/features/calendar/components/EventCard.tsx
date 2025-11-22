@@ -1,18 +1,9 @@
 "use client";
 
+import type { CalendarEventViewModel } from "../types";
+
 interface EventCardProps {
-  event: {
-    id: string;
-    title: string;
-    description: string | null;
-    startAt: string;
-    endAt: string | null;
-    isAllDay: boolean;
-    color: string | null;
-    createdBy: {
-      displayName: string;
-    };
-  };
+  event: CalendarEventViewModel;
   onClick: () => void;
 }
 
@@ -35,12 +26,13 @@ export function EventCard({ event, onClick }: EventCardProps) {
     });
   };
 
+  const containerClasses = [
+    "w-full rounded-lg border border-[var(--color-border-default)] bg-white p-3 text-left transition-colors hover:bg-[var(--color-bg-subtle)]",
+    event.isOptimistic ? "opacity-70" : "opacity-100",
+  ].join(" ");
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full rounded-lg border border-[var(--color-border-default)] bg-white p-3 text-left transition-colors hover:bg-[var(--color-bg-subtle)]"
-    >
+    <button type="button" onClick={onClick} className={containerClasses}>
       <div className="flex items-center gap-2">
         <div
           className={`size-3 rounded-full ${COLOR_CLASSES[event.color ?? "pink"] ?? "bg-pink-400"}`}
