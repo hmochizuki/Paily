@@ -113,3 +113,16 @@ src/
 1. フェーズ1のタスクから着手し、基盤（Supabase/Prisma初期化とApp Router構成）を整える。
 2. `src/common/ui` のコンポーネント設計を着手し、画面ごとの実装に備える。
 3. 招待関連の Server Actions と Realtime 構成を別途設計レビュー。
+
+## パフォーマンス改善タスク（追加）
+1. **計測とボトルネック特定**
+   - Vercel Analytics または Next.js の `instrumentation.ts` で `/calendar` リクエストの`requireUser`→`prisma` クエリ→クライアント初期描画の分解を取得。
+   - Prisma の `log: ["query"]` で `calendarEvent` 取得に掛かる時間と件数を収集し、4秒遅延の主因（ネットワーク／DB／CPU）を切り分ける。
+2. **データ取得の最適化**
+   - 選択中スペースIDをサーバーでも把握できるよう `useSelectedSpace` の状態を cookie や URL パラメータに同期し、`CalendarDataSection` では1スペース分のみ `findMany` する。
+   - 期間フィルター（例: 今日から±3ヶ月）をクエリ時に適用し、不要なイベントのシリアライズを減らす。
+3. **DB インデックスとキャッシュ**
+   - `calendar_events` テーブルに `(couple_id, start_at)` 複合インデックスを追加し、時間範囲＋スペースID検索を高速化。
+   - `/calendar` のイベント一覧は `unstable_cache`（`revalidate: 60`）でサーバーキャッシュし、同一ユーザー/スペースへの連続アクセスで再クエリを避ける。変更時は `router.refresh()` で無効化される前提。
+4. **段階的改善と検証**
+   - 上記を1つずつ適用し、LightHouse/リアルユーザー計測で4秒→1秒台を目標に効果を記録。効果が薄ければリクエスト再利用（`Promise.all` 化）や Edge Functions へのオフロードを検討する。

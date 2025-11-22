@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import { CalendarPageContent } from "@/features/calendar/components/CalendarPageContent";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -19,52 +20,95 @@ export default function CalendarPage() {
   );
 }
 
+type CalendarData = {
+  userSpaceIds: string[];
+  events: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    startAt: string;
+    endAt: string | null;
+    isAllDay: boolean;
+    color: string | null;
+    coupleId: string;
+    createdBy: {
+      displayName: string;
+    };
+  }>;
+  profileDisplayName: string | null;
+};
+
+const getCalendarData = unstable_cache(
+  async (userId: string): Promise<CalendarData> => {
+    const profile = await prisma.profile.findUnique({
+      where: { id: userId },
+      select: { displayName: true },
+    });
+
+    const couplePartners = await prisma.couplePartner.findMany({
+      where: { profileId: userId },
+      select: { coupleId: true },
+    });
+
+    if (couplePartners.length === 0) {
+      return {
+        userSpaceIds: [],
+        events: [],
+        profileDisplayName: profile?.displayName ?? null,
+      };
+    }
+
+    const userSpaceIds = couplePartners.map((cp) => cp.coupleId);
+
+    const eventsData = await prisma.calendarEvent.findMany({
+      where: { coupleId: { in: userSpaceIds } },
+      orderBy: { startAt: "asc" },
+      include: {
+        createdBy: {
+          select: { displayName: true },
+        },
+      },
+    });
+
+    const events = eventsData.map((event) => ({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startAt: event.startAt.toISOString(),
+      endAt: event.endAt ? event.endAt.toISOString() : null,
+      isAllDay: event.isAllDay,
+      color: event.color,
+      coupleId: event.coupleId,
+      createdBy: {
+        displayName: event.createdBy?.displayName ?? "メンバー",
+      },
+    }));
+
+    return {
+      userSpaceIds,
+      events,
+      profileDisplayName: profile?.displayName ?? null,
+    };
+  },
+  ["calendar-data"],
+  { revalidate: 60 },
+);
+
 async function CalendarDataSection() {
   const user = await requireUser();
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id },
-    select: { displayName: true },
-  });
+  const cached = await getCalendarData(user.id);
 
-  const couplePartners = await prisma.couplePartner.findMany({
-    where: { profileId: user.id },
-    select: { coupleId: true },
-  });
-
-  if (couplePartners.length === 0) {
+  if (cached.userSpaceIds.length === 0) {
     return <NoSpaceMessage />;
   }
 
-  const userSpaceIds = couplePartners.map((cp) => cp.coupleId);
-
-  const eventsData = await prisma.calendarEvent.findMany({
-    where: { coupleId: { in: userSpaceIds } },
-    orderBy: { startAt: "asc" },
-    include: {
-      createdBy: {
-        select: { displayName: true },
-      },
-    },
-  });
-
-  const events = eventsData.map((event) => ({
-    id: event.id,
-    title: event.title,
-    description: event.description,
-    startAt: event.startAt.toISOString(),
-    endAt: event.endAt ? event.endAt.toISOString() : null,
-    isAllDay: event.isAllDay,
-    color: event.color,
-    coupleId: event.coupleId,
-    createdBy: event.createdBy,
-  }));
-
-  const currentUserDisplayName = profile?.displayName ?? user.email ?? "あなた";
+  const currentUserDisplayName =
+    cached.profileDisplayName ?? user.email ?? "あなた";
 
   return (
     <CalendarPageContent
-      allEvents={events}
-      userSpaceIds={userSpaceIds}
+      allEvents={cached.events}
+      userSpaceIds={cached.userSpaceIds}
       currentUserDisplayName={currentUserDisplayName}
     />
   );
