@@ -1,5 +1,5 @@
-import BottomNavigation from "@/common/BottomNavigation";
-import Header from "@/common/Header";
+import BottomNavigation from "@/common/ui/layout/BottomNavigation";
+import Header from "@/common/ui/layout/Header";
 
 export default function ProtectedLayout({
   children,

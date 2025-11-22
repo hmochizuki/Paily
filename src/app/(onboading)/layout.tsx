@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import BottomNavigation from "@/common/BottomNavigation";
-import Header from "@/common/Header";
+import BottomNavigation from "@/common/ui/layout/BottomNavigation";
+import Header from "@/common/ui/layout/Header";
 import { requireUser } from "@/lib/auth";
 
 interface AuthenticatedLayoutProps {
