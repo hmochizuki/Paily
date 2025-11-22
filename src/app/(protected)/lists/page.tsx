@@ -38,7 +38,7 @@ async function ListsDataSection() {
 
   return (
     <ListsPageContent
-      allLists={cached.lists}
+      allListsDto={cached.lists}
       userSpaceIds={cached.userSpaceIds}
     />
   );

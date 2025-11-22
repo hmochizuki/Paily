@@ -1,31 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelectedSpace } from "@/hooks/useSelectedSpace";
+import {
+  toListOverviewViewModels,
+  type ListOverviewDto,
+} from "../types";
 import { CreateListButton } from "./CreateListButton";
 import { DeleteListButton } from "./DeleteListButton";
 
-interface ListData {
-  id: string;
-  title: string;
-  coupleId: string;
-  isActive: boolean;
-  updatedAt: string;
-  uncheckedItemCount: number;
-}
-
 interface ListsPageContentProps {
-  allLists: ListData[];
+  allListsDto: ListOverviewDto[];
   userSpaceIds: string[];
 }
 
 export function ListsPageContent({
-  allLists,
+  allListsDto,
   userSpaceIds,
 }: ListsPageContentProps) {
   const { selectedSpaceId, selectSpace, isLoading } = useSelectedSpace();
   const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
+  const allLists = useMemo(
+    () => toListOverviewViewModels(allListsDto),
+    [allListsDto],
+  );
 
   useEffect(() => {
     if (!isLoading && userSpaceIds.length > 0) {
@@ -78,7 +77,7 @@ export function ListsPageContent({
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-[var(--color-text-muted)]">
-                      {new Date(list.updatedAt).toLocaleDateString("ja-JP")}
+                      {list.updatedAt.toLocaleDateString("ja-JP")}
                     </p>
                     {!list.isActive && (
                       <span className="mt-1 inline-block rounded-full bg-[var(--color-bg-muted)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]">

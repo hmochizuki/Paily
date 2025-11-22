@@ -1,9 +1,9 @@
 import { unstable_cache } from "next/cache";
-import type { ShoppingListItemViewModel } from "@/features/shopping-list/types";
+import type { ShoppingListItemDto } from "@/features/shopping-list/types";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
 
-export type ListOverview = {
+export type ListOverviewDto = {
   id: string;
   title: string;
   coupleId: string;
@@ -14,7 +14,7 @@ export type ListOverview = {
 
 export type ListsData = {
   userSpaceIds: string[];
-  lists: ListOverview[];
+  lists: ListOverviewDto[];
 };
 
 async function fetchListsData(userId: string): Promise<ListsData> {
@@ -43,7 +43,7 @@ async function fetchListsData(userId: string): Promise<ListsData> {
     },
   });
 
-  const serialized: ListOverview[] = lists.map((list) => ({
+  const serialized: ListOverviewDto[] = lists.map((list) => ({
     id: list.id,
     title: list.title,
     coupleId: list.coupleId,
@@ -72,7 +72,7 @@ export async function getListsDataFresh(userId: string) {
 export type ListDetailData = {
   listId: string;
   coupleId: string;
-  items: ShoppingListItemViewModel[];
+  items: ShoppingListItemDto[];
   currentUserDisplayName: string;
 };
 
@@ -121,19 +121,21 @@ async function fetchListDetailData(
     return null;
   }
 
-  const items: ShoppingListItemViewModel[] = list.items.map((item) => ({
+  const items: ShoppingListItemDto[] = list.items.map((item) => ({
     id: item.id,
     name: item.name,
     note: item.note,
     quantity: item.quantity,
-    createdAt: item.createdAt,
+    createdAt: item.createdAt.toISOString(),
     addedBy: {
       displayName: item.addedBy?.displayName ?? "メンバー",
     },
     state: item.state
       ? {
           isChecked: item.state.isChecked,
-          checkedAt: item.state.checkedAt,
+          checkedAt: item.state.checkedAt
+            ? item.state.checkedAt.toISOString()
+            : null,
         }
       : null,
   }));

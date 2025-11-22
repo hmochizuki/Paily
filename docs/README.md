@@ -14,6 +14,7 @@
 - [`screen-flow.md`](screen-flow.md): 認証状態とカップルスペース作成状態に基づいた画面遷移フロー。
 - [`implementation-plan.md`](implementation-plan.md): App Router構成とフェーズ別の実装タスク整理。
 - [`server-architecture.md`](server-architecture.md): サーバーサイドのレイヤードアーキテクチャ設計とリファクタリング指針。
+- [`date-handling-guide.md`](date-handling-guide.md): Dateシリアライズ問題の背景と型定義・変換パターン。
 
 ## 運用のヒント
 - 調査・検証のたびに更新し、最新の学びを反映する。

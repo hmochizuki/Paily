@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import type { SpaceDto } from "@/features/space/types";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
 
@@ -8,15 +9,7 @@ export type ProfileSettingsData = {
     gender: string | null;
     avatarUrl: string | null;
   } | null;
-  spaces: Array<{
-    id: string;
-    createdAt: string;
-    partners: Array<{
-      profile: {
-        displayName: string;
-      };
-    }>;
-  }>;
+  spaces: SpaceDto[];
 };
 
 async function fetchProfileSettingsData(

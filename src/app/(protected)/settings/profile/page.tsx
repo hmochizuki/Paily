@@ -96,7 +96,7 @@ async function ProfileSettingsContent() {
 
       {hasCouple ? (
         <SpaceSelector
-          spaces={cached.spaces}
+          spacesDto={cached.spaces}
           currentUserId={profile.displayName}
         />
       ) : (

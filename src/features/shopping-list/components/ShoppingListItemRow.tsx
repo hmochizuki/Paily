@@ -77,7 +77,7 @@ export function ShoppingListItemRow({
         <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">
           {isChecked && item.state?.checkedAt
             ? `完了: ${item.state.checkedAt.toLocaleDateString("ja-JP")}`
-            : `追加: ${item.createdAt.toLocaleDateString("ja-JP")}`}
+            : `追加: ${item.createdAt?.toLocaleDateString("ja-JP") ?? "不明"}`}
         </p>
         {item.note && (
           <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">

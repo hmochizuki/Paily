@@ -18,8 +18,7 @@ const COLOR_CLASSES: Record<string, string> = {
 };
 
 export function EventCard({ event, onClick }: EventCardProps) {
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatTime = (date: Date) => {
     return date.toLocaleTimeString("ja-JP", {
       hour: "2-digit",
       minute: "2-digit",

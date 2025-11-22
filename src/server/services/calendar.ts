@@ -1,10 +1,10 @@
 import { unstable_cache } from "next/cache";
-import type { CalendarEventViewModel } from "@/features/calendar/types";
+import type { CalendarEventDto } from "@/features/calendar/types";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
 
 export type CalendarData = {
-  events: CalendarEventViewModel[];
+  events: CalendarEventDto[];
   userSpaceIds: string[];
   profileDisplayName: string | null;
 };
@@ -45,7 +45,7 @@ async function fetchCalendarData(userId: string): Promise<CalendarData> {
     },
   });
 
-  const events: CalendarEventViewModel[] = eventsData.map((event) => ({
+  const events: CalendarEventDto[] = eventsData.map((event) => ({
     id: event.id,
     title: event.title,
     description: event.description,

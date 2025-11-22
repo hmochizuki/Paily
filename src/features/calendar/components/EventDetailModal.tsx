@@ -46,8 +46,7 @@ const EVENT_COLORS = [
   { value: "purple", label: "パープル", class: "bg-purple-400" },
 ];
 
-function formatDateTime(dateString: string, isAllDay: boolean): string {
-  const date = new Date(dateString);
+function formatDateTime(date: Date, isAllDay: boolean): string {
   const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 
   if (isAllDay) {
@@ -62,16 +61,14 @@ function formatDateTime(dateString: string, isAllDay: boolean): string {
   return `${dateStr} ${timeStr}`;
 }
 
-function formatDateForInput(dateString: string): string {
-  const date = new Date(dateString);
+function formatDateForInput(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
-function formatTimeForInput(dateString: string): string {
-  const date = new Date(dateString);
+function formatTimeForInput(date: Date): string {
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;

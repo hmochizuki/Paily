@@ -1,24 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useSelectedSpace } from "@/hooks/useSelectedSpace";
-
-interface Space {
-  id: string;
-  createdAt: string;
-  partners: {
-    profile: {
-      displayName: string;
-    };
-  }[];
-}
+import {
+  toSpaceViewModels,
+  type SpaceDto,
+  type SpaceViewModel,
+} from "../types";
 
 interface SpaceSelectorProps {
-  spaces: Space[];
+  spacesDto: SpaceDto[];
   currentUserId: string;
 }
 
-export function SpaceSelector({ spaces, currentUserId }: SpaceSelectorProps) {
+export function SpaceSelector({ spacesDto, currentUserId }: SpaceSelectorProps) {
+  const spaces = useMemo<SpaceViewModel[]>(
+    () => toSpaceViewModels(spacesDto),
+    [spacesDto],
+  );
   const { selectedSpaceId, selectSpace, isLoading } = useSelectedSpace();
 
   useEffect(() => {
@@ -42,14 +41,14 @@ export function SpaceSelector({ spaces, currentUserId }: SpaceSelectorProps) {
     );
   }
 
-  const getSpaceLabel = (space: Space) => {
+  const getSpaceLabel = (space: SpaceViewModel) => {
     const otherPartners = space.partners.filter(
       (p) => p.profile.displayName !== currentUserId,
     );
     if (otherPartners.length > 0) {
       return otherPartners.map((p) => p.profile.displayName).join(", ");
     }
-    const date = new Date(space.createdAt);
+    const date = space.createdAt;
     return `スペース (${date.toLocaleDateString("ja-JP")})`;
   };
 
@@ -117,7 +116,7 @@ export function SpaceSelector({ spaces, currentUserId }: SpaceSelectorProps) {
                 </div>
                 <p className="mt-1 pl-6 text-xs text-[var(--color-text-muted)]">
                   作成日:{" "}
-                  {new Date(space.createdAt).toLocaleDateString("ja-JP")}
+                  {space.createdAt.toLocaleDateString("ja-JP")}
                 </p>
               </button>
             );

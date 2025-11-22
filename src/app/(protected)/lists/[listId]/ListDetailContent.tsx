@@ -32,7 +32,7 @@ export async function ListDetailContent({ listId }: ListDetailContentProps) {
       <ShoppingListDetailClient
         listId={cached.listId}
         coupleId={cached.coupleId}
-        initialItems={cached.items}
+        initialItemsDto={cached.items}
         currentUserDisplayName={cached.currentUserDisplayName}
       />
     </div>

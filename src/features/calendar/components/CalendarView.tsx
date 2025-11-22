@@ -46,12 +46,12 @@ function isSameDay(date1: Date, date2: Date): boolean {
 }
 
 function isEventOnDate(event: CalendarEventViewModel, date: Date): boolean {
-  const eventStart = new Date(event.startAt);
+  const eventStart = new Date(event.startAt.getTime());
   eventStart.setHours(0, 0, 0, 0);
 
   const eventEnd = event.endAt
-    ? new Date(event.endAt)
-    : new Date(event.startAt);
+    ? new Date(event.endAt.getTime())
+    : new Date(event.startAt.getTime());
   eventEnd.setHours(23, 59, 59, 999);
 
   const checkDate = new Date(date);

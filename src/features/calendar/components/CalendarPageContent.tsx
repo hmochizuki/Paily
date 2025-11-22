@@ -1,23 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelectedSpace } from "@/hooks/useSelectedSpace";
-import type { CalendarEventViewModel } from "../types";
+import {
+  toCalendarEventViewModels,
+  type CalendarEventDto,
+} from "../types";
 import { CalendarClient } from "./CalendarClient";
 
 interface CalendarPageContentProps {
-  allEvents: CalendarEventViewModel[];
+  allEventsDto: CalendarEventDto[];
   userSpaceIds: string[];
   currentUserDisplayName: string;
 }
 
 export function CalendarPageContent({
-  allEvents,
+  allEventsDto,
   userSpaceIds,
   currentUserDisplayName,
 }: CalendarPageContentProps) {
   const { selectedSpaceId, selectSpace, isLoading } = useSelectedSpace();
   const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
+  const allEvents = useMemo(
+    () => toCalendarEventViewModels(allEventsDto),
+    [allEventsDto],
+  );
 
   useEffect(() => {
     if (!isLoading && userSpaceIds.length > 0) {

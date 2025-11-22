@@ -1,11 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { startTransition, useEffect, useOptimistic, useRef } from "react";
+import {
+  startTransition,
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useRef,
+} from "react";
 import { addItemAction } from "../actions/addItem";
 import { deleteItemAction } from "../actions/deleteItem";
 import { toggleItemCheckAction } from "../actions/toggleItemCheck";
-import type { ShoppingListItemViewModel } from "../types";
+import {
+  type ShoppingListItemDto,
+  type ShoppingListItemViewModel,
+  toShoppingListItemViewModels,
+} from "../types";
 import { AddItemForm } from "./AddItemForm";
 import { CompletedItemsSection } from "./CompletedItemsSection";
 import { ShoppingListItemRow } from "./ShoppingListItemRow";
@@ -49,29 +59,33 @@ const optimisticReducer = (
 interface ShoppingListDetailClientProps {
   listId: string;
   coupleId: string;
-  initialItems: ShoppingListItemViewModel[];
+  initialItemsDto: ShoppingListItemDto[];
   currentUserDisplayName: string;
 }
 
 export function ShoppingListDetailClient({
   listId,
   coupleId,
-  initialItems,
+  initialItemsDto,
   currentUserDisplayName,
 }: ShoppingListDetailClientProps) {
+  const initialViewModels = useMemo(
+    () => toShoppingListItemViewModels(initialItemsDto),
+    [initialItemsDto],
+  );
   const router = useRouter();
   const [optimisticItems, dispatchOptimistic] = useOptimistic<
     ShoppingListItemViewModel[],
     OptimisticAction
-  >(initialItems, optimisticReducer);
-  const serverSnapshotRef = useRef(initialItems);
+  >(initialViewModels, optimisticReducer);
+  const serverSnapshotRef = useRef(initialViewModels);
 
   useEffect(() => {
-    serverSnapshotRef.current = initialItems;
+    serverSnapshotRef.current = initialViewModels;
     startTransition(() => {
-      dispatchOptimistic({ type: "replace", items: initialItems });
+      dispatchOptimistic({ type: "replace", items: initialViewModels });
     });
-  }, [initialItems, dispatchOptimistic]);
+  }, [initialViewModels, dispatchOptimistic]);
 
   const refreshAfterMutation = () => {
     router.refresh();

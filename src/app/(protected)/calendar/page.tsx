@@ -32,7 +32,7 @@ async function CalendarDataSection() {
 
   return (
     <CalendarPageContent
-      allEvents={cached.events}
+      allEventsDto={cached.events}
       userSpaceIds={cached.userSpaceIds}
       currentUserDisplayName={currentUserDisplayName}
     />
