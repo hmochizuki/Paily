@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useOptimistic, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { addItemAction } from "../actions/addItem";
 import { deleteItemAction } from "../actions/deleteItem";
@@ -10,9 +10,41 @@ import { AddItemForm } from "./AddItemForm";
 import { CompletedItemsSection } from "./CompletedItemsSection";
 import { ShoppingListItemRow } from "./ShoppingListItemRow";
 
-type OptimisticUpdater = (
+type OptimisticAction =
+  | { type: "replace"; items: ShoppingListItemViewModel[] }
+  | { type: "add"; item: ShoppingListItemViewModel }
+  | { type: "toggle"; itemId: string }
+  | { type: "delete"; itemId: string };
+
+const optimisticReducer = (
   items: ShoppingListItemViewModel[],
-) => ShoppingListItemViewModel[];
+  action: OptimisticAction,
+): ShoppingListItemViewModel[] => {
+  switch (action.type) {
+    case "replace":
+      return action.items;
+    case "add":
+      return [...items, action.item];
+    case "toggle":
+      return items.map((item) => {
+        if (item.id !== action.itemId) {
+          return item;
+        }
+        const nextIsChecked = !(item.state?.isChecked ?? false);
+        return {
+          ...item,
+          state: {
+            isChecked: nextIsChecked,
+            checkedAt: nextIsChecked ? new Date() : null,
+          },
+        };
+      });
+    case "delete":
+      return items.filter((item) => item.id !== action.itemId);
+    default:
+      return items;
+  }
+};
 
 interface ShoppingListDetailClientProps {
   listId: string;
@@ -28,24 +60,23 @@ export function ShoppingListDetailClient({
   currentUserDisplayName,
 }: ShoppingListDetailClientProps) {
   const router = useRouter();
-  const [optimisticItems, setOptimisticItems] = useState(initialItems);
+  const [optimisticItems, dispatchOptimistic] = useOptimistic<
+    ShoppingListItemViewModel[],
+    OptimisticAction
+  >(initialItems, optimisticReducer);
   const serverSnapshotRef = useRef(initialItems);
 
   useEffect(() => {
     serverSnapshotRef.current = initialItems;
-    setOptimisticItems(initialItems);
-  }, [initialItems]);
+    dispatchOptimistic({ type: "replace", items: initialItems });
+  }, [initialItems, dispatchOptimistic]);
 
   const refreshAfterMutation = () => {
     router.refresh();
   };
 
   const revertToServerSnapshot = () => {
-    setOptimisticItems(serverSnapshotRef.current);
-  };
-
-  const applyOptimisticUpdate = (updater: OptimisticUpdater) => {
-    setOptimisticItems((prev) => updater(prev));
+    dispatchOptimistic({ type: "replace", items: serverSnapshotRef.current });
   };
 
   const createOptimisticItem = (name: string): ShoppingListItemViewModel => ({
@@ -71,7 +102,7 @@ export function ShoppingListDetailClient({
     }
 
     const optimisticItem = createOptimisticItem(name.trim());
-    applyOptimisticUpdate((items) => [...items, optimisticItem]);
+    dispatchOptimistic({ type: "add", item: optimisticItem });
 
     try {
       await addItemAction(formData);
@@ -83,21 +114,7 @@ export function ShoppingListDetailClient({
   };
 
   const handleToggleItem = async (itemId: string) => {
-    applyOptimisticUpdate((items) =>
-      items.map((item) => {
-        if (item.id !== itemId) {
-          return item;
-        }
-        const nextIsChecked = !(item.state?.isChecked ?? false);
-        return {
-          ...item,
-          state: {
-            isChecked: nextIsChecked,
-            checkedAt: nextIsChecked ? new Date() : null,
-          },
-        };
-      }),
-    );
+    dispatchOptimistic({ type: "toggle", itemId });
 
     try {
       await toggleItemCheckAction(itemId);
@@ -109,7 +126,7 @@ export function ShoppingListDetailClient({
   };
 
   const handleDeleteItem = async (itemId: string) => {
-    applyOptimisticUpdate((items) => items.filter((item) => item.id !== itemId));
+    dispatchOptimistic({ type: "delete", itemId });
 
     try {
       await deleteItemAction(itemId);
