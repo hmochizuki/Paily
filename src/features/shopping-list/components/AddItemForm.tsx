@@ -11,11 +11,7 @@ interface AddItemFormProps {
   onSubmit?: AddItemSubmitHandler;
 }
 
-export function AddItemForm({
-  listId,
-  coupleId,
-  onSubmit,
-}: AddItemFormProps) {
+export function AddItemForm({ listId, coupleId, onSubmit }: AddItemFormProps) {
   const [name, setName] = useState("");
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);

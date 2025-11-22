@@ -63,8 +63,7 @@ export default async function ListDetailPage({ params }: ListDetailPageProps) {
   }
 
   const checkedItems = list.items.filter((item) => item.state?.isChecked);
-  const currentUserDisplayName =
-    profile?.displayName ?? user.email ?? "あなた";
+  const currentUserDisplayName = profile?.displayName ?? user.email ?? "あなた";
 
   return (
     <div className="space-y-6 px-4 pt-4 pb-24">
