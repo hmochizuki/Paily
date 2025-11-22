@@ -3,19 +3,27 @@
 import { useRef, useState, useTransition } from "react";
 import { addItemAction } from "../actions/addItem";
 
+type AddItemSubmitHandler = (formData: FormData) => Promise<void>;
+
 interface AddItemFormProps {
   listId: string;
   coupleId: string;
+  onSubmit?: AddItemSubmitHandler;
 }
 
-export function AddItemForm({ listId, coupleId }: AddItemFormProps) {
+export function AddItemForm({
+  listId,
+  coupleId,
+  onSubmit,
+}: AddItemFormProps) {
   const [name, setName] = useState("");
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const submitHandler = onSubmit ?? addItemAction;
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
-      await addItemAction(formData);
+      await submitHandler(formData);
       setName("");
       formRef.current?.reset();
     });

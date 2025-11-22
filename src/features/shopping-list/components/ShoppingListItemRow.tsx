@@ -1,48 +1,42 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { deleteItemAction } from "../actions/deleteItem";
-import { toggleItemCheckAction } from "../actions/toggleItemCheck";
+import { useTransition } from "react";
+import type { ShoppingListItemViewModel } from "../types";
 
 interface ShoppingListItemRowProps {
-  item: {
-    id: string;
-    name: string;
-    note: string | null;
-    quantity: string | null;
-    createdAt: Date;
-    addedBy: {
-      displayName: string;
-    };
-    state: {
-      isChecked: boolean;
-      checkedAt: Date | null;
-    } | null;
-  };
+  item: ShoppingListItemViewModel;
+  onToggle: (itemId: string) => Promise<void> | void;
+  onDelete: (itemId: string) => Promise<void> | void;
 }
 
-export function ShoppingListItemRow({ item }: ShoppingListItemRowProps) {
+export function ShoppingListItemRow({
+  item,
+  onToggle,
+  onDelete,
+}: ShoppingListItemRowProps) {
   const [isTogglingPending, startToggleTransition] = useTransition();
   const [isDeletingPending, startDeleteTransition] = useTransition();
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleToggle = () => {
     startToggleTransition(async () => {
-      await toggleItemCheckAction(item.id);
+      await onToggle(item.id);
     });
   };
 
   const handleDelete = () => {
-    setIsDeleting(true);
     startDeleteTransition(async () => {
-      await deleteItemAction(item.id);
+      await onDelete(item.id);
     });
   };
 
   const isChecked = item.state?.isChecked ?? false;
+  const containerClasses = [
+    "flex items-center gap-3 rounded-lg border border-[var(--color-border-default)] bg-white p-3 transition-opacity",
+    item.isOptimistic ? "opacity-70" : "opacity-100",
+  ].join(" ");
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-[var(--color-border-default)] bg-white p-3">
+    <div className={containerClasses}>
       <button
         type="button"
         onClick={handleToggle}
@@ -95,7 +89,7 @@ export function ShoppingListItemRow({ item }: ShoppingListItemRowProps) {
       <button
         type="button"
         onClick={handleDelete}
-        disabled={isDeleting || isDeletingPending || isTogglingPending}
+        disabled={isDeletingPending || isTogglingPending}
         className="rounded p-1 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)] disabled:opacity-50"
         aria-label="削除"
       >

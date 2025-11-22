@@ -1,26 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import type { ShoppingListItemViewModel } from "../types";
 import { ShoppingListItemRow } from "./ShoppingListItemRow";
 
 interface CompletedItemsSectionProps {
-  items: Array<{
-    id: string;
-    name: string;
-    note: string | null;
-    quantity: string | null;
-    createdAt: Date;
-    addedBy: {
-      displayName: string;
-    };
-    state: {
-      isChecked: boolean;
-      checkedAt: Date | null;
-    } | null;
-  }>;
+  items: ShoppingListItemViewModel[];
+  onToggle: (itemId: string) => Promise<void> | void;
+  onDelete: (itemId: string) => Promise<void> | void;
 }
 
-export function CompletedItemsSection({ items }: CompletedItemsSectionProps) {
+export function CompletedItemsSection({
+  items,
+  onToggle,
+  onDelete,
+}: CompletedItemsSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (items.length === 0) {
@@ -54,7 +48,12 @@ export function CompletedItemsSection({ items }: CompletedItemsSectionProps) {
       {isExpanded && (
         <div className="space-y-1">
           {items.map((item) => (
-            <ShoppingListItemRow key={item.id} item={item} />
+            <ShoppingListItemRow
+              key={item.id}
+              item={item}
+              onToggle={onToggle}
+              onDelete={onDelete}
+            />
           ))}
         </div>
       )}

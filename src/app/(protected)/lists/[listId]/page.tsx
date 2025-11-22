@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AddItemForm } from "@/features/shopping-list/components/AddItemForm";
-import { CompletedItemsSection } from "@/features/shopping-list/components/CompletedItemsSection";
-import { ShoppingListItemRow } from "@/features/shopping-list/components/ShoppingListItemRow";
+import { ShoppingListDetailClient } from "@/features/shopping-list/components/ShoppingListDetailClient";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -27,6 +25,11 @@ export async function generateMetadata({ params }: ListDetailPageProps) {
 export default async function ListDetailPage({ params }: ListDetailPageProps) {
   const { listId } = await params;
   const user = await requireUser();
+
+  const profile = await prisma.profile.findUnique({
+    where: { id: user.id },
+    select: { displayName: true },
+  });
 
   const couplePartner = await prisma.couplePartner.findFirst({
     where: { profileId: user.id },
@@ -59,8 +62,9 @@ export default async function ListDetailPage({ params }: ListDetailPageProps) {
     notFound();
   }
 
-  const uncheckedItems = list.items.filter((item) => !item.state?.isChecked);
   const checkedItems = list.items.filter((item) => item.state?.isChecked);
+  const currentUserDisplayName =
+    profile?.displayName ?? user.email ?? "あなた";
 
   return (
     <div className="space-y-6 px-4 pt-4 pb-24">
@@ -94,32 +98,12 @@ export default async function ListDetailPage({ params }: ListDetailPageProps) {
         </p>
       </div>
 
-      <AddItemForm listId={list.id} coupleId={list.coupleId} />
-
-      {list.items.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-[var(--color-border-default)] bg-white p-6 text-center text-sm text-[var(--color-text-muted)]">
-          アイテムがありません。上のフォームから追加してください。
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {uncheckedItems.length > 0 && (
-            <div className="space-y-2">
-              <h2 className="text-sm font-medium text-[var(--color-text-muted)]">
-                未完了 ({uncheckedItems.length})
-              </h2>
-              <div className="space-y-1">
-                {uncheckedItems.map((item) => (
-                  <ShoppingListItemRow key={item.id} item={item} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {checkedItems.length > 0 && (
-            <CompletedItemsSection items={checkedItems} />
-          )}
-        </div>
-      )}
+      <ShoppingListDetailClient
+        listId={list.id}
+        coupleId={list.coupleId}
+        initialItems={list.items}
+        currentUserDisplayName={currentUserDisplayName}
+      />
     </div>
   );
 }
