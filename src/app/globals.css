@@ -190,6 +190,8 @@ body {
     box-shadow: 0 25px 45px rgb(67 46 54 / 0.18);
     backdrop-filter: blur(22px);
     text-align: center;
+    width: 280px;
+    height: 280px;
   }
 
   .splash-screen__message {
