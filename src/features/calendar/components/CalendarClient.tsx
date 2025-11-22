@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useOptimistic, useRef } from "react";
+import { startTransition, useEffect, useOptimistic, useRef } from "react";
 import { createEventAction } from "../actions/createEvent";
 import { deleteEventAction } from "../actions/deleteEvent";
 import { updateEventAction } from "../actions/updateEvent";
@@ -121,7 +121,9 @@ export function CalendarClient({
 
   useEffect(() => {
     serverSnapshotRef.current = initialEvents;
-    dispatchOptimistic({ type: "replace", events: initialEvents });
+    startTransition(() => {
+      dispatchOptimistic({ type: "replace", events: initialEvents });
+    });
   }, [initialEvents, dispatchOptimistic]);
 
   const refreshAfterMutation = () => {
