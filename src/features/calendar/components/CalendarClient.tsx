@@ -7,7 +7,6 @@ import { deleteEventAction } from "../actions/deleteEvent";
 import { updateEventAction } from "../actions/updateEvent";
 import type { CalendarEventViewModel } from "../types";
 import { CalendarView } from "./CalendarView";
-import { CreateEventButton } from "./CreateEventButton";
 
 type OptimisticAction =
   | { type: "replace"; events: CalendarEventViewModel[] }
@@ -231,7 +230,6 @@ export function CalendarClient({
         onUpdateEvent={handleUpdateEvent}
         onDeleteEvent={handleDeleteEvent}
       />
-      <CreateEventButton coupleId={coupleId} onSubmit={handleCreateEvent} />
     </div>
   );
 }

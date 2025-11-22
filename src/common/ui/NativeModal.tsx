@@ -78,7 +78,7 @@ export function NativeModal({
   const containerBase =
     "z-[var(--z-index-modal)] w-full bg-white shadow-2xl will-change-transform";
   const sizeClasses = isBottomPlacement
-    ? "min-h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] max-w-3xl overflow-y-auto sm:min-h-0 sm:max-h-[calc(100vh-4rem)]"
+    ? "min-h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] max-w-3xl overflow-y-auto sm:min-h-0 sm:max-h-[calc(100vh-4rem)]"
     : "max-h-[calc(100vh-4rem)] max-w-lg";
   const shapeClasses = isBottomPlacement
     ? "rounded-t-3xl px-4 pb-8 pt-4 sm:rounded-2xl"

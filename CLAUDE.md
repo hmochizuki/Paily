@@ -118,7 +118,7 @@ z-indexは必ずCSS変数として`globals.css`で定義し、グローバルに
 --z-index-modal: 30;
 --z-index-popover: 40;
 --z-index-tooltip: 50;
---z-index-header: 100;
+--z-index-header: 50;
 --z-index-bottom-nav: 100;
 --z-index-notification: 200;
 ```

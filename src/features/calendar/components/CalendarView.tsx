@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import type { CalendarEventViewModel } from "../types";
 import { DayDetailModal } from "./DayDetailModal";
-import { EventCard } from "./EventCard";
 import { EventDetailModal } from "./EventDetailModal";
 import { EventFormModal } from "./EventFormModal";
 
@@ -86,9 +85,10 @@ export function CalendarView({
   const [detailEvent, setDetailEvent] = useState<CalendarEventViewModel | null>(
     null,
   );
-  const [detailModalState, setDetailModalState] = useState<
-    { date: Date; isOpen: boolean } | null
-  >(null);
+  const [detailModalState, setDetailModalState] = useState<{
+    date: Date;
+    isOpen: boolean;
+  } | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -107,9 +107,6 @@ export function CalendarView({
     setCurrentDate(new Date());
   };
 
-  const selectedDateEvents = selectedDate
-    ? events.filter((event) => isEventOnDate(event, selectedDate))
-    : [];
   const detailModalDate = detailModalState?.date ?? null;
   const detailDateEvents = detailModalDate
     ? events.filter((event) => isEventOnDate(event, detailModalDate))
@@ -284,30 +281,6 @@ export function CalendarView({
           })}
         </div>
       </div>
-
-      {selectedDate && (
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-[var(--color-text-default)]">
-            {selectedDate.getFullYear()}年{selectedDate.getMonth() + 1}月
-            {selectedDate.getDate()}日
-          </h3>
-          {selectedDateEvents.length === 0 ? (
-            <p className="text-sm text-[var(--color-text-muted)]">
-              予定はありません
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {selectedDateEvents.map((event) => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  onClick={() => setDetailEvent(event)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {modalDate && (
         <EventFormModal
