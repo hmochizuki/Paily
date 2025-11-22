@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import type { CalendarEventViewModel } from "../types";
 import { DayDetailModal } from "./DayDetailModal";
-import { EventDetailModal } from "./EventDetailModal";
 import { EventFormModal } from "./EventFormModal";
 
 interface CalendarViewProps {
@@ -82,9 +81,7 @@ export function CalendarView({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [modalDate, setModalDate] = useState<Date | null>(null);
-  const [detailEvent, setDetailEvent] = useState<CalendarEventViewModel | null>(
-    null,
-  );
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [detailModalState, setDetailModalState] = useState<{
     date: Date;
     isOpen: boolean;
@@ -111,13 +108,18 @@ export function CalendarView({
   const detailDateEvents = detailModalDate
     ? events.filter((event) => isEventOnDate(event, detailModalDate))
     : [];
+  const selectedDetailEvent = selectedEventId
+    ? events.find((event) => event.id === selectedEventId) ?? null
+    : null;
 
   const openDetailModal = (date: Date) => {
+    setSelectedEventId(null);
     setDetailModalState({ date, isOpen: true });
   };
 
   const closeDetailModal = () => {
     setDetailModalState((prev) => (prev ? { ...prev, isOpen: false } : null));
+    setSelectedEventId(null);
   };
 
   useEffect(() => {
@@ -140,6 +142,16 @@ export function CalendarView({
       closeDetailModal();
     }
   };
+
+  useEffect(() => {
+    if (!selectedEventId) {
+      return;
+    }
+    const exists = events.some((event) => event.id === selectedEventId);
+    if (!exists) {
+      setSelectedEventId(null);
+    }
+  }, [events, selectedEventId]);
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4">
@@ -293,29 +305,23 @@ export function CalendarView({
         />
       )}
 
-      {detailEvent && (
-        <EventDetailModal
-          event={detailEvent}
-          onClose={() => setDetailEvent(null)}
-          onUpdate={onUpdateEvent}
-          onDelete={onDeleteEvent}
-        />
-      )}
-
       {detailModalState && detailModalDate && (
         <DayDetailModal
           date={detailModalDate}
           events={detailDateEvents}
           isOpen={detailModalState.isOpen}
           onClose={closeDetailModal}
+          selectedEvent={selectedDetailEvent}
           onSelectEvent={(event) => {
-            setDetailEvent(event);
-            closeDetailModal();
+            setSelectedEventId(event.id);
           }}
+          onBackToList={() => setSelectedEventId(null)}
           onAddEvent={() => {
             setModalDate(detailModalDate);
             closeDetailModal();
           }}
+          onUpdateEvent={onUpdateEvent}
+          onDeleteEvent={onDeleteEvent}
         />
       )}
     </div>
