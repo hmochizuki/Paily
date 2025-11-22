@@ -116,7 +116,8 @@ export function SpaceSelector({ spaces, currentUserId }: SpaceSelectorProps) {
                   )}
                 </div>
                 <p className="mt-1 pl-6 text-xs text-[var(--color-text-muted)]">
-                  作成日: {new Date(space.createdAt).toLocaleDateString("ja-JP")}
+                  作成日:{" "}
+                  {new Date(space.createdAt).toLocaleDateString("ja-JP")}
                 </p>
               </button>
             );

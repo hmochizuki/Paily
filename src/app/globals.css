@@ -98,3 +98,80 @@ body {
 :where(input, textarea, select) {
   outline: none;
 }
+
+@layer components {
+  .animated-logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ffffff 0%,
+      var(--color-brand) 55%,
+      var(--color-brand-hover) 100%
+    );
+    box-shadow:
+      0 12px 25px rgb(67 46 54 / 0.25),
+      inset 0 0 20px rgb(255 255 255 / 0.4);
+    overflow: visible;
+  }
+
+  .animated-logo__glow {
+    position: absolute;
+    inset: -12%;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle,
+      rgb(255 255 255 / 0.55) 0%,
+      rgb(255 155 195 / 0.2) 45%,
+      transparent 70%
+    );
+    filter: blur(18px);
+    opacity: 0.55;
+    animation: animated-logo-glow 9s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  .animated-logo__icon {
+    width: 70%;
+    height: 70%;
+    animation: animated-logo-float 4.5s ease-in-out infinite;
+    will-change: transform;
+  }
+}
+
+@keyframes animated-logo-float {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-6px) scale(1.03);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes animated-logo-glow {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.07);
+  }
+  100% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-logo__glow,
+  .animated-logo__icon {
+    animation: none;
+  }
+}
