@@ -139,12 +139,23 @@ export function ShoppingListDetailClient({
     }
   };
 
-  const uncheckedItems = optimisticItems.filter(
-    (item) => !(item.state?.isChecked ?? false),
-  );
-  const checkedItems = optimisticItems.filter(
-    (item) => item.state?.isChecked ?? false,
-  );
+  const uncheckedItems = optimisticItems
+    .filter((item) => !(item.state?.isChecked ?? false))
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  const checkedItems = optimisticItems
+    .filter((item) => item.state?.isChecked ?? false)
+    .sort((a, b) => {
+      const aTime = a.state?.checkedAt
+        ? new Date(a.state.checkedAt).getTime()
+        : new Date(a.createdAt).getTime();
+      const bTime = b.state?.checkedAt
+        ? new Date(b.state.checkedAt).getTime()
+        : new Date(b.createdAt).getTime();
+      return bTime - aTime;
+    });
 
   return (
     <>
