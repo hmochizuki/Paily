@@ -223,7 +223,7 @@ export function CalendarClient({
   };
 
   return (
-    <>
+    <div className="relative flex h-full flex-1 flex-col">
       <CalendarView
         events={optimisticEvents}
         coupleId={coupleId}
@@ -232,6 +232,6 @@ export function CalendarClient({
         onDeleteEvent={handleDeleteEvent}
       />
       <CreateEventButton coupleId={coupleId} onSubmit={handleCreateEvent} />
-    </>
+    </div>
   );
 }

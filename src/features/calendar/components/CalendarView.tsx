@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { CalendarEventViewModel } from "../types";
+import { DayDetailModal } from "./DayDetailModal";
 import { EventCard } from "./EventCard";
 import { EventDetailModal } from "./EventDetailModal";
 import { EventFormModal } from "./EventFormModal";
@@ -78,11 +79,12 @@ export function CalendarView({
   onDeleteEvent,
 }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [modalDate, setModalDate] = useState<Date | null>(null);
   const [detailEvent, setDetailEvent] = useState<CalendarEventViewModel | null>(
     null,
   );
+  const [detailDate, setDetailDate] = useState<Date | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -104,9 +106,21 @@ export function CalendarView({
   const selectedDateEvents = selectedDate
     ? events.filter((event) => isEventOnDate(event, selectedDate))
     : [];
+  const detailDateEvents = detailDate
+    ? events.filter((event) => isEventOnDate(event, detailDate))
+    : [];
+
+  const handleDateClick = (date: Date) => {
+    if (selectedDate && isSameDay(selectedDate, date)) {
+      setDetailDate(date);
+    } else {
+      setSelectedDate(date);
+      setDetailDate(null);
+    }
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-full flex-1 flex-col gap-4">
       <div className="flex items-center justify-between">
         <button
           type="button"
@@ -203,10 +217,7 @@ export function CalendarView({
               <button
                 key={dateKey}
                 type="button"
-                onClick={() => {
-                  setSelectedDate(date);
-                  setModalDate(date);
-                }}
+                onClick={() => handleDateClick(date)}
                 className={`relative min-h-[60px] border-b border-r border-[var(--color-border-default)] p-1 text-left transition-colors hover:bg-[var(--color-bg-subtle)] ${
                   index % 7 === 6 ? "border-r-0" : ""
                 } ${index >= days.length - 7 ? "border-b-0" : ""} ${isSelected ? "bg-pink-50 ring-2 ring-inset ring-[var(--color-brand)]" : ""}`}
@@ -290,6 +301,22 @@ export function CalendarView({
           onClose={() => setDetailEvent(null)}
           onUpdate={onUpdateEvent}
           onDelete={onDeleteEvent}
+        />
+      )}
+
+      {detailDate && (
+        <DayDetailModal
+          date={detailDate}
+          events={detailDateEvents}
+          onClose={() => setDetailDate(null)}
+          onSelectEvent={(event) => {
+            setDetailEvent(event);
+            setDetailDate(null);
+          }}
+          onAddEvent={() => {
+            setModalDate(detailDate);
+            setDetailDate(null);
+          }}
         />
       )}
     </div>

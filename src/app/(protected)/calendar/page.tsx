@@ -75,16 +75,7 @@ export default async function CalendarPage() {
   const currentUserDisplayName = profile?.displayName ?? user.email ?? "あなた";
 
   return (
-    <div className="space-y-6 px-4 pt-4 pb-24">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold text-[var(--color-text-default)]">
-          カレンダー
-        </h1>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          ふたりの予定を共有できます。
-        </p>
-      </div>
-
+    <div className="flex h-full flex-1 flex-col px-4 pb-4 pt-2">
       <CalendarPageContent
         allEvents={events}
         userSpaceIds={userSpaceIds}

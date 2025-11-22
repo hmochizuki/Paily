@@ -46,10 +46,12 @@ export function CalendarPageContent({
   const events = allEvents.filter((event) => event.coupleId === currentSpaceId);
 
   return (
-    <CalendarClient
-      coupleId={currentSpaceId}
-      initialEvents={events}
-      currentUserDisplayName={currentUserDisplayName}
-    />
+    <div className="flex h-full flex-1 flex-col">
+      <CalendarClient
+        coupleId={currentSpaceId}
+        initialEvents={events}
+        currentUserDisplayName={currentUserDisplayName}
+      />
+    </div>
   );
 }
