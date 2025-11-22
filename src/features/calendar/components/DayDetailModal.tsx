@@ -47,9 +47,6 @@ export function DayDetailModal({
     >
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">
-            選択中の日付
-          </p>
           <h2 className="text-xl font-semibold text-[var(--color-text-default)]">
             {formatDisplayDate(date)}
           </h2>
