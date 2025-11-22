@@ -7,6 +7,7 @@ import { EventCard } from "./EventCard";
 interface DayDetailModalProps {
   date: Date;
   events: CalendarEventViewModel[];
+  isOpen: boolean;
   onClose: () => void;
   onSelectEvent: (event: CalendarEventViewModel) => void;
   onAddEvent: () => void;
@@ -19,13 +20,14 @@ function formatDisplayDate(date: Date): string {
 export function DayDetailModal({
   date,
   events,
+  isOpen,
   onClose,
   onSelectEvent,
   onAddEvent,
 }: DayDetailModalProps) {
   return (
     <NativeModal
-      isOpen
+      isOpen={isOpen}
       onClose={onClose}
       placement="bottom"
       contentClassName="max-h-full overflow-y-auto"

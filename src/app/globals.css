@@ -69,12 +69,12 @@
 
   /* z-index の階層管理 */
   --z-index-dropdown: 10;
-  --z-index-modal-backdrop: 20;
-  --z-index-modal: 30;
-  --z-index-popover: 40;
-  --z-index-tooltip: 50;
-  --z-index-header: 100;
-  --z-index-bottom-nav: 100;
+  --z-index-header: 50;
+  --z-index-bottom-nav: 50;
+  --z-index-modal-backdrop: 120;
+  --z-index-modal: 130;
+  --z-index-popover: 140;
+  --z-index-tooltip: 150;
   --z-index-notification: 200;
   --z-index-splash: 400;
 }

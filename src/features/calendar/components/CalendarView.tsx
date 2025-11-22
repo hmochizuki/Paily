@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CalendarEventViewModel } from "../types";
 import { DayDetailModal } from "./DayDetailModal";
 import { EventCard } from "./EventCard";
@@ -71,6 +71,8 @@ const COLOR_CLASSES: Record<string, string> = {
   purple: "bg-purple-400",
 };
 
+const DETAIL_MODAL_TRANSITION_MS = 300;
+
 export function CalendarView({
   events,
   coupleId,
@@ -84,7 +86,9 @@ export function CalendarView({
   const [detailEvent, setDetailEvent] = useState<CalendarEventViewModel | null>(
     null,
   );
-  const [detailDate, setDetailDate] = useState<Date | null>(null);
+  const [detailModalState, setDetailModalState] = useState<
+    { date: Date; isOpen: boolean } | null
+  >(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -106,16 +110,37 @@ export function CalendarView({
   const selectedDateEvents = selectedDate
     ? events.filter((event) => isEventOnDate(event, selectedDate))
     : [];
-  const detailDateEvents = detailDate
-    ? events.filter((event) => isEventOnDate(event, detailDate))
+  const detailModalDate = detailModalState?.date ?? null;
+  const detailDateEvents = detailModalDate
+    ? events.filter((event) => isEventOnDate(event, detailModalDate))
     : [];
+
+  const openDetailModal = (date: Date) => {
+    setDetailModalState({ date, isOpen: true });
+  };
+
+  const closeDetailModal = () => {
+    setDetailModalState((prev) => (prev ? { ...prev, isOpen: false } : null));
+  };
+
+  useEffect(() => {
+    if (!detailModalState || detailModalState.isOpen) {
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      setDetailModalState(null);
+    }, DETAIL_MODAL_TRANSITION_MS);
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [detailModalState]);
 
   const handleDateClick = (date: Date) => {
     if (selectedDate && isSameDay(selectedDate, date)) {
-      setDetailDate(date);
+      openDetailModal(date);
     } else {
       setSelectedDate(date);
-      setDetailDate(null);
+      closeDetailModal();
     }
   };
 
@@ -304,18 +329,19 @@ export function CalendarView({
         />
       )}
 
-      {detailDate && (
+      {detailModalState && detailModalDate && (
         <DayDetailModal
-          date={detailDate}
+          date={detailModalDate}
           events={detailDateEvents}
-          onClose={() => setDetailDate(null)}
+          isOpen={detailModalState.isOpen}
+          onClose={closeDetailModal}
           onSelectEvent={(event) => {
             setDetailEvent(event);
-            setDetailDate(null);
+            closeDetailModal();
           }}
           onAddEvent={() => {
-            setModalDate(detailDate);
-            setDetailDate(null);
+            setModalDate(detailModalDate);
+            closeDetailModal();
           }}
         />
       )}
