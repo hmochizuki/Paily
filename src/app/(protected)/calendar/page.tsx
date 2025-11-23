@@ -1,5 +1,5 @@
-import { Suspense } from "react";
 import Link from "next/link";
+import { Suspense } from "react";
 import { CalendarPageContent } from "@/features/calendar/components/CalendarPageContent";
 import { requireUser } from "@/lib/auth";
 import { getCalendarData } from "@/server/services/calendar";

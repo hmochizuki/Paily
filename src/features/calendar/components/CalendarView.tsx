@@ -109,7 +109,7 @@ export function CalendarView({
     ? events.filter((event) => isEventOnDate(event, detailModalDate))
     : [];
   const selectedDetailEvent = selectedEventId
-    ? events.find((event) => event.id === selectedEventId) ?? null
+    ? (events.find((event) => event.id === selectedEventId) ?? null)
     : null;
 
   const openDetailModal = (date: Date) => {

@@ -13,11 +13,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm dev          # Next.js開発サーバーの起動（Turbopack使用）
 pnpm build        # プロダクションビルド（Prismaの生成とマイグレーションも実行）
 pnpm start        # プロダクションサーバーの起動
+pnpm ci           # フォーマット、リント、型チェックを連続実行（CI/コミット前に実行推奨）
 ```
 
 ### Prisma
 ```bash
-pnpm prisma:generate  # Prismaクライアントの生成
+pnpm prisma:gen       # Prismaクライアントの生成
 pnpm prisma:migrate   # 開発環境でのマイグレーション実行
 pnpm prisma:studio    # Prisma Studioの起動（データベース管理GUI）
 ```
@@ -31,10 +32,12 @@ pnpm supabase:restart  # ローカルSupabaseの再起動
 
 ### コード品質
 ```bash
-pnpm lint    # Biomeでのリントチェック
-pnpm format  # Biomeでのコードフォーマット
-pnpm tsc     # TypeScriptの型チェック
-pnpm ci      # フォーマット、リント、型チェックを連続実行
+pnpm lint           # Biomeでのリントチェック
+pnpm format         # Biomeでのコードフォーマット
+pnpm tsc            # TypeScriptの型チェック
+pnpm unused:check   # 未使用のexportやファイルをチェック
+pnpm unused:fix     # 未使用のexportやファイルを削除
+pnpm ci             # フォーマット、リント、型チェックを連続実行
 ```
 
 ## ドキュメント運用
@@ -134,6 +137,8 @@ z-indexは必ずCSS変数として`globals.css`で定義し、グローバルに
 
 ### コード品質管理
 - **Biome**: リンターおよびフォーマッターとして使用
+- **ts-remove-unused**: 未使用のexportやファイルを検出・削除
+  - 定期的に`pnpm unused:check`で確認し、`pnpm unused:fix`でクリーンアップすること
 - TypeScript strictモードを有効化（`tsconfig.json`）
 - `@/*` エイリアスを`src/*`に設定
 - VSCode設定で保存時自動フォーマット（`.vscode/settings.json`）
@@ -145,6 +150,9 @@ z-indexは必ずCSS変数として`globals.css`で定義し、グローバルに
 - 型アサーション（`as`）の使用は禁止
 - strictモードが有効
 - 必ず型安全性を保つこと
+- **型定義は原則`type`を使用し、`interface`は使用しない**
+  - `interface`は抽象化層などで型定義のoverrideが必要な場合のみ使用
+  - 理由: 意図しないoverrideは保守性を損ねるため
 
 ### パッケージ管理
 - **バージョンは必ず固定する**（`^`や`~`を使用しない）

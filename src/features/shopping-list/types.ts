@@ -9,12 +9,10 @@ interface ShoppingListItemCore {
   addedBy: {
     displayName: string;
   };
-  state:
-    | {
-        isChecked: boolean;
-        checkedAt: Date | null;
-      }
-    | null;
+  state: {
+    isChecked: boolean;
+    checkedAt: Date | null;
+  } | null;
 }
 
 export type ShoppingListItemDto = ReplaceDateWithString<ShoppingListItemCore>;

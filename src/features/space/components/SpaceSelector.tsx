@@ -3,9 +3,9 @@
 import { useEffect, useMemo } from "react";
 import { useSelectedSpace } from "@/hooks/useSelectedSpace";
 import {
-  toSpaceViewModels,
   type SpaceDto,
   type SpaceViewModel,
+  toSpaceViewModels,
 } from "../types";
 
 interface SpaceSelectorProps {
@@ -13,7 +13,10 @@ interface SpaceSelectorProps {
   currentUserId: string;
 }
 
-export function SpaceSelector({ spacesDto, currentUserId }: SpaceSelectorProps) {
+export function SpaceSelector({
+  spacesDto,
+  currentUserId,
+}: SpaceSelectorProps) {
   const spaces = useMemo<SpaceViewModel[]>(
     () => toSpaceViewModels(spacesDto),
     [spacesDto],
@@ -115,8 +118,7 @@ export function SpaceSelector({ spacesDto, currentUserId }: SpaceSelectorProps) 
                   )}
                 </div>
                 <p className="mt-1 pl-6 text-xs text-[var(--color-text-muted)]">
-                  作成日:{" "}
-                  {space.createdAt.toLocaleDateString("ja-JP")}
+                  作成日: {space.createdAt.toLocaleDateString("ja-JP")}
                 </p>
               </button>
             );
