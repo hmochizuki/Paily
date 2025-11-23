@@ -120,3 +120,28 @@ export function upsertShoppingListItemState(
     create: data,
   });
 }
+
+export async function findRecentLabelsByCoupleId(coupleId: string, limit = 30) {
+  const grouped = await prisma.shoppingListItem.groupBy({
+    by: ["label"],
+    where: {
+      coupleId,
+      label: {
+        not: null,
+      },
+    },
+    orderBy: {
+      _max: {
+        updatedAt: "desc",
+      },
+    },
+    _max: {
+      updatedAt: true,
+    },
+    take: limit,
+  });
+
+  return grouped
+    .map((item) => item.label)
+    .filter((label): label is string => Boolean(label));
+}
