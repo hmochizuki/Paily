@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { SuggestionInput } from "@/common/ui/form/SuggestionInput";
 import { addItemAction } from "@/server/handlers/shoppingListHandler";
 
 type AddItemSubmitHandler = (formData: FormData) => Promise<void>;
@@ -8,10 +9,16 @@ type AddItemSubmitHandler = (formData: FormData) => Promise<void>;
 interface AddItemFormProps {
   listId: string;
   coupleId: string;
+  labelSuggestions?: string[];
   onSubmit?: AddItemSubmitHandler;
 }
 
-export function AddItemForm({ listId, coupleId, onSubmit }: AddItemFormProps) {
+export function AddItemForm({
+  listId,
+  coupleId,
+  labelSuggestions = [],
+  onSubmit,
+}: AddItemFormProps) {
   const [name, setName] = useState("");
   const [label, setLabel] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -41,15 +48,17 @@ export function AddItemForm({ listId, coupleId, onSubmit }: AddItemFormProps) {
         disabled={isPending}
       />
       <div className="flex gap-2">
-        <input
+        <SuggestionInput
           name="label"
           type="text"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
+          onSuggestionSelect={(value) => setLabel(value)}
           placeholder="ラベル (任意)"
           maxLength={10}
           className="flex-1 rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
           disabled={isPending}
+          suggestions={labelSuggestions}
         />
         <button
           type="submit"
