@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { updateDisplayNameAction } from "../actions/updateProfile";
+import { updateDisplayNameAction } from "@/server/handlers/profileHandler";
 
 interface EditDisplayNameFormProps {
   currentName: string;

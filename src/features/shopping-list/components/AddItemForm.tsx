@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { addItemAction } from "../actions/addItem";
+import { addItemAction } from "@/server/handlers/shoppingListHandler";
 
 type AddItemSubmitHandler = (formData: FormData) => Promise<void>;
 

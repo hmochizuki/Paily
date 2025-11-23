@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { deleteListAction } from "../actions/deleteList";
+import { deleteListAction } from "@/server/handlers/shoppingListHandler";
 
 interface DeleteListButtonProps {
   listId: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createListAction } from "../actions/createList";
+import { createListAction } from "@/server/handlers/shoppingListHandler";
 
 interface CreateListButtonProps {
   coupleId: string;

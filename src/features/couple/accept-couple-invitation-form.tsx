@@ -7,7 +7,7 @@ import TextField from "@/common/ui/form/TextField";
 import {
   type AcceptInvitationState,
   acceptCoupleInvitationAction,
-} from "@/features/couple/actions/accept-couple-invitation";
+} from "@/server/handlers/coupleHandler";
 
 const INITIAL_STATE: AcceptInvitationState = { status: "idle" };
 

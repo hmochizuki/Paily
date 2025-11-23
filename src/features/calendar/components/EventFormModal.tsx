@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createEventAction } from "../actions/createEvent";
+import { createEventAction } from "@/server/handlers/calendarHandler";
 import { EVENT_COLORS } from "../constants";
 
 type EventFormSubmitHandler = (formData: FormData) => Promise<void>;

@@ -1,7 +1,16 @@
 import { unstable_cache } from "next/cache";
 import type { ShoppingListItemDto } from "@/features/shopping-list/types";
-import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
+import {
+  findCouplePartnerByProfileId,
+  listCouplePartnersByProfileId,
+} from "@/server/repositories/coupleRepository";
+import { findProfileDisplayName } from "@/server/repositories/profileRepository";
+import {
+  findShoppingListDetail,
+  findShoppingListsByCoupleIds,
+  findShoppingListTitle,
+} from "@/server/repositories/shoppingListRepository";
 
 type ListOverviewDto = {
   id: string;
@@ -18,10 +27,7 @@ type ListsData = {
 };
 
 async function fetchListsData(userId: string): Promise<ListsData> {
-  const couplePartners = await prisma.couplePartner.findMany({
-    where: { profileId: userId },
-    select: { coupleId: true },
-  });
+  const couplePartners = await listCouplePartnersByProfileId(userId);
 
   if (couplePartners.length === 0) {
     return { userSpaceIds: [], lists: [] };
@@ -29,19 +35,7 @@ async function fetchListsData(userId: string): Promise<ListsData> {
 
   const userSpaceIds = couplePartners.map((cp) => cp.coupleId);
 
-  const lists = await prisma.shoppingList.findMany({
-    where: { coupleId: { in: userSpaceIds } },
-    orderBy: { updatedAt: "desc" },
-    include: {
-      items: {
-        select: {
-          state: {
-            select: { isChecked: true },
-          },
-        },
-      },
-    },
-  });
+  const lists = await findShoppingListsByCoupleIds(userSpaceIds);
 
   const serialized: ListOverviewDto[] = lists.map((list) => ({
     id: list.id,
@@ -76,15 +70,8 @@ async function fetchListDetailData(
   userId: string,
   listId: string,
 ): Promise<ListDetailData | null> {
-  const profilePromise = prisma.profile.findUnique({
-    where: { id: userId },
-    select: { displayName: true },
-  });
-
-  const couplePartnerPromise = prisma.couplePartner.findFirst({
-    where: { profileId: userId },
-    select: { coupleId: true },
-  });
+  const profilePromise = findProfileDisplayName(userId);
+  const couplePartnerPromise = findCouplePartnerByProfileId(userId);
 
   const [profile, couplePartner] = await Promise.all([
     profilePromise,
@@ -95,23 +82,7 @@ async function fetchListDetailData(
     return null;
   }
 
-  const list = await prisma.shoppingList.findUnique({
-    where: {
-      id: listId,
-      coupleId: couplePartner.coupleId,
-    },
-    include: {
-      items: {
-        orderBy: { createdAt: "asc" },
-        include: {
-          state: true,
-          addedBy: {
-            select: { displayName: true },
-          },
-        },
-      },
-    },
-  });
+  const list = await findShoppingListDetail(listId, couplePartner.coupleId);
 
   if (!list) {
     return null;
@@ -156,4 +127,10 @@ const listDetailDataCache = unstable_cache(
 
 export async function getListDetailData(userId: string, listId: string) {
   return listDetailDataCache(userId, listId);
+}
+
+export async function getShoppingListTitle(listId: string) {
+  const list = await findShoppingListTitle(listId);
+
+  return list?.title ?? null;
 }

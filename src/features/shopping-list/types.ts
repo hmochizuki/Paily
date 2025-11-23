@@ -58,9 +58,7 @@ interface ListOverviewCore {
 export type ListOverviewDto = ReplaceDateWithString<ListOverviewCore>;
 type ListOverviewViewModel = ListOverviewCore;
 
-function toListOverviewViewModel(
-  dto: ListOverviewDto,
-): ListOverviewViewModel {
+function toListOverviewViewModel(dto: ListOverviewDto): ListOverviewViewModel {
   const { updatedAt, ...rest } = dto;
   return {
     ...rest,

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { updateProfileDisplayName } from "@/server/services/profileService";
 
 export async function updateDisplayNameAction(formData: FormData) {
   const user = await requireUser();
@@ -16,10 +16,7 @@ export async function updateDisplayNameAction(formData: FormData) {
     throw new Error("表示名は50文字以内で入力してください");
   }
 
-  await prisma.profile.update({
-    where: { id: user.id },
-    data: { displayName: displayName.trim() },
-  });
+  await updateProfileDisplayName(user.id, displayName.trim());
 
   revalidatePath("/settings/profile");
 }

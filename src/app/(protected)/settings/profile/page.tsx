@@ -6,7 +6,7 @@ import { logoutAction } from "@/features/auth/actions/logout";
 import { EditDisplayNameForm } from "@/features/profile/components/EditDisplayNameForm";
 import { SpaceSelector } from "@/features/space/components/SpaceSelector";
 import { requireUser } from "@/lib/auth";
-import { getProfileSettingsData } from "@/server/services/profile";
+import { getProfileSettingsData } from "@/server/services/profileService";
 import { ProfilePageSkeleton } from "./_components/ProfilePageSkeleton";
 
 export const metadata = {

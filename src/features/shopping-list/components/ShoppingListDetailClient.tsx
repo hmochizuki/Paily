@@ -8,9 +8,11 @@ import {
   useOptimistic,
   useRef,
 } from "react";
-import { addItemAction } from "../actions/addItem";
-import { deleteItemAction } from "../actions/deleteItem";
-import { toggleItemCheckAction } from "../actions/toggleItemCheck";
+import {
+  addItemAction,
+  deleteItemAction,
+  toggleItemCheckAction,
+} from "@/server/handlers/shoppingListHandler";
 import {
   type ShoppingListItemDto,
   type ShoppingListItemViewModel,

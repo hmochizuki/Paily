@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { prisma } from "@/lib/prisma";
+import { getShoppingListTitle } from "@/server/services/listService";
 
 import { ListDetailSkeleton } from "./_components/ListDetailSkeleton";
 import { ListDetailContent } from "./ListDetailContent";
@@ -14,13 +14,10 @@ interface ListDetailPageProps {
 
 export async function generateMetadata({ params }: ListDetailPageProps) {
   const { listId } = await params;
-  const list = await prisma.shoppingList.findUnique({
-    where: { id: listId },
-    select: { title: true },
-  });
+  const listTitle = await getShoppingListTitle(listId);
 
   return {
-    title: list?.title ?? "リスト詳細",
+    title: listTitle ?? "リスト詳細",
   };
 }
 

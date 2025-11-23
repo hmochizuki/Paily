@@ -1,8 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { ShoppingListDetailClient } from "@/features/shopping-list/components/ShoppingListDetailClient";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { getListDetailData } from "@/server/services/lists";
+import { getCouplePartnerByProfileId } from "@/server/services/coupleService";
+import { getListDetailData } from "@/server/services/listService";
 
 type ListDetailContentProps = {
   listId: string;
@@ -12,10 +12,7 @@ type ListDetailContentProps = {
 export async function ListDetailContent({ listId }: ListDetailContentProps) {
   const user = await requireUser();
 
-  const couplePartner = await prisma.couplePartner.findFirst({
-    where: { profileId: user.id },
-    select: { coupleId: true },
-  });
+  const couplePartner = await getCouplePartnerByProfileId(user.id);
 
   if (!couplePartner) {
     redirect("/lists");

@@ -2,8 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { deleteEventAction } from "../actions/deleteEvent";
-import { updateEventAction } from "../actions/updateEvent";
+import {
+  deleteEventAction,
+  updateEventAction,
+} from "@/server/handlers/calendarHandler";
 import { EVENT_COLORS } from "../constants";
 import type { CalendarEventViewModel } from "../types";
 

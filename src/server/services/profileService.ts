@@ -1,7 +1,10 @@
 import { unstable_cache } from "next/cache";
 import type { SpaceDto } from "@/features/space/types";
-import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
+import {
+  findProfileWithCouples,
+  updateProfile,
+} from "@/server/repositories/profileRepository";
 
 type ProfileSettingsData = {
   profile: {
@@ -15,26 +18,7 @@ type ProfileSettingsData = {
 async function fetchProfileSettingsData(
   userId: string,
 ): Promise<ProfileSettingsData> {
-  const profile = await prisma.profile.findUnique({
-    where: { id: userId },
-    include: {
-      couples: {
-        include: {
-          couple: {
-            include: {
-              partners: {
-                include: {
-                  profile: {
-                    select: { displayName: true },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
+  const profile = await findProfileWithCouples(userId);
 
   if (!profile) {
     return { profile: null, spaces: [] };
@@ -70,4 +54,11 @@ const profileSettingsCache = unstable_cache(
 
 export async function getProfileSettingsData(userId: string) {
   return profileSettingsCache(userId);
+}
+
+export async function updateProfileDisplayName(
+  userId: string,
+  displayName: string,
+) {
+  await updateProfile(userId, { displayName });
 }

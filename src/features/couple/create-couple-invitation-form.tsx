@@ -6,7 +6,7 @@ import TextField from "@/common/ui/form/TextField";
 import {
   type CreateCoupleState,
   createCoupleInvitationAction,
-} from "@/features/couple/actions/create-couple-invitation";
+} from "@/server/handlers/coupleHandler";
 
 const INITIAL_STATE: CreateCoupleState = { status: "idle" };
 

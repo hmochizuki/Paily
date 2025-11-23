@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ListsPageContent } from "@/features/shopping-list/components/ListsPageContent";
 import { requireUser } from "@/lib/auth";
-import { getListsData } from "@/server/services/lists";
+import { getListsData } from "@/server/services/listService";
 import { ListsPageSkeleton } from "./_components/ListsPageSkeleton";
 
 export const metadata = {
