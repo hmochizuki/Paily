@@ -16,9 +16,6 @@ export default function ListsPage() {
         <h1 className="text-2xl font-semibold text-[var(--color-text-default)]">
           共有リスト
         </h1>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          共有リストの一覧を表示します。
-        </p>
       </div>
 
       <Suspense fallback={<ListsPageSkeleton />}>

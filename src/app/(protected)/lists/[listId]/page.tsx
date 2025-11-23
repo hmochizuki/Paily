@@ -17,15 +17,16 @@ export async function generateMetadata({ params }: ListDetailPageProps) {
   const listTitle = await getShoppingListTitle(listId);
 
   return {
-    title: listTitle ?? "リスト詳細",
+    title: `リスト詳細 ${listTitle && `| ${listTitle}`}`,
   };
 }
 
 export default async function ListDetailPage({ params }: ListDetailPageProps) {
   const { listId } = await params;
+  const listTitle = await getShoppingListTitle(listId);
 
   return (
-    <ListDetailModalShell>
+    <ListDetailModalShell listTitle={listTitle ?? "リスト詳細"}>
       <Suspense fallback={<ListDetailSkeleton />}>
         <ListDetailContent listId={listId} variant="modal" />
       </Suspense>

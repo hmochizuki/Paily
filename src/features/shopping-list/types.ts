@@ -3,6 +3,7 @@ import type { ReplaceDateWithString } from "@/types/replace-date-with-string";
 interface ShoppingListItemCore {
   id: string;
   name: string;
+  label: string | null;
   note: string | null;
   quantity: string | null;
   createdAt: Date;

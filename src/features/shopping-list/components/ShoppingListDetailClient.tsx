@@ -97,9 +97,13 @@ export function ShoppingListDetailClient({
     dispatchOptimistic({ type: "replace", items: serverSnapshotRef.current });
   };
 
-  const createOptimisticItem = (name: string): ShoppingListItemViewModel => ({
+  const createOptimisticItem = (params: {
+    name: string;
+    label: string | null;
+  }): ShoppingListItemViewModel => ({
     id: `temp-${crypto.randomUUID()}`,
-    name,
+    name: params.name,
+    label: params.label,
     note: null,
     quantity: null,
     createdAt: new Date(),
@@ -115,11 +119,24 @@ export function ShoppingListDetailClient({
 
   const handleAddItem = async (formData: FormData) => {
     const name = formData.get("name");
+    const rawLabel = formData.get("label");
     if (typeof name !== "string" || name.trim() === "") {
       return;
     }
 
-    const optimisticItem = createOptimisticItem(name.trim());
+    const label =
+      typeof rawLabel === "string" && rawLabel.trim() !== ""
+        ? rawLabel.trim()
+        : null;
+
+    if (label && label.length > 10) {
+      return;
+    }
+
+    const optimisticItem = createOptimisticItem({
+      name: name.trim(),
+      label,
+    });
     dispatchOptimistic({ type: "add", item: optimisticItem });
 
     try {

@@ -73,6 +73,7 @@
 | couple_id | uuid | FK→couples.id | クエリ最適化用に冗長保持 |
 | added_by | uuid | FK→profiles.id | 追加したパートナー |
 | name | text | NOT NULL | アイテム名 |
+| label | varchar(10) | NULL | グルーピング用ラベル（最大10文字） |
 | category | text | NULL | 任意のカテゴリ |
 | note | text | NULL | 補足メモ |
 | quantity | text | NULL | 数量・単位 |

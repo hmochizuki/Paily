@@ -96,6 +96,7 @@ model ShoppingListItem {
   coupleId  String   @map("couple_id") @db.Uuid
   addedById String   @map("added_by") @db.Uuid
   name      String
+  label     String?  @db.VarChar(10)
   category  String?
   note      String?
   quantity  String?

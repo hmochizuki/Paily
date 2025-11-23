@@ -9,9 +9,13 @@ const MODAL_ANIMATION_DURATION_MS = 300;
 
 interface ListDetailModalShellProps {
   children: ReactNode;
+  listTitle: string;
 }
 
-export function ListDetailModalShell({ children }: ListDetailModalShellProps) {
+export function ListDetailModalShell({
+  children,
+  listTitle,
+}: ListDetailModalShellProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
 
@@ -35,7 +39,7 @@ export function ListDetailModalShell({ children }: ListDetailModalShellProps) {
     >
       <div className="mb-4 flex items-center justify-between">
         <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">
-          共有リスト
+          {listTitle}
         </p>
         <button
           type="button"

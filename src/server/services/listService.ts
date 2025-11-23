@@ -91,6 +91,7 @@ async function fetchListDetailData(
   const items: ShoppingListItemDto[] = list.items.map((item) => ({
     id: item.id,
     name: item.name,
+    label: item.label,
     note: item.note,
     quantity: item.quantity,
     createdAt: item.createdAt.toISOString(),

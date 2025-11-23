@@ -108,7 +108,7 @@ Supabase Auth API を呼び出し、成功時に `profiles` を upsert してリ
 ヘッダー（リスト名、共有メンバーアイコン）、未チェック／チェック済みタブ、アイテムカード（名称・数量・追加者・最終更新）、インラインアクションメニュー、履歴へ切り替えるスイッチ。
 
 #### フォーム
-下部固定のアイテム追加フォーム（名称必須、数量／カテゴリ／メモ任意）。フォーム送信で `shopping_list_items` を作成し、`shopping_list_item_states` は初期値 false で保存。
+下部固定のアイテム追加フォーム（名称必須、ラベル〔任意・10文字以内〕／数量／カテゴリ／メモ任意）。ラベルはリスト内グルーピング用の短いタグとして扱い、未入力時は null を保存。フォーム送信で `shopping_list_items` を作成し、`shopping_list_item_states` は初期値 false で保存。
 
 #### サブミット／内部ロジック
 チェック操作は `shopping_list_item_states` を更新（`is_checked` true/false、`checked_by`、`checked_at`）。アイテム削除は論理削除でなく実レコード削除。リアルタイム購読で他端末の変更を即反映。

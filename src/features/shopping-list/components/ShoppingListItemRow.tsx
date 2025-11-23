@@ -64,16 +64,23 @@ export function ShoppingListItemRow({
       </button>
 
       <div className="flex-1">
-        <p
-          className={`text-sm ${isChecked ? "text-[var(--color-text-muted)] line-through" : "text-[var(--color-text-default)]"}`}
-        >
-          {item.name}
-          {item.quantity && (
-            <span className="ml-2 text-xs text-[var(--color-text-muted)]">
-              ({item.quantity})
+        <div className="flex flex-wrap justify-between gap-2">
+          <p
+            className={`text-sm ${isChecked ? "text-[var(--color-text-muted)] line-through" : "text-[var(--color-text-default)]"}`}
+          >
+            {item.name}
+            {item.quantity && (
+              <span className="ml-2 text-xs text-[var(--color-text-muted)]">
+                ({item.quantity})
+              </span>
+            )}
+          </p>
+          {item.label && (
+            <span className="inline-flex items-center rounded-full border border-[var(--color-brand)] bg-[var(--color-brand)] px-2 py-0 text-xs font-semibold text-[var(--color-brand-contrast)] shadow-sm">
+              {item.label}
             </span>
           )}
-        </p>
+        </div>
         <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">
           {isChecked && item.state?.checkedAt
             ? `完了: ${item.state.checkedAt.toLocaleDateString("ja-JP")}`

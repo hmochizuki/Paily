@@ -20,3 +20,6 @@
 - 調査・検証のたびに更新し、最新の学びを反映する。
 - Supabaseのスキーマやチケットなど関連資料ができ次第リンクを追加する。
 - READMEに古くなった情報や要検討の論点があれば明記しておく。
+
+## 最近の更新
+- 2025-11-20: 買い物リストアイテムのラベル仕様（10文字以内のタグ）を [data-model.md#shopping_list_items](data-model.md#shopping_list_items) と [screen-architecture.md#6-%E8%B2%B7%E3%81%84%E7%89%A9%E3%83%AA%E3%82%B9%E3%83%88%E8%A9%B3%E7%B4%B0](screen-architecture.md#6-%E8%B2%B7%E3%81%84%E7%89%A9%E3%83%AA%E3%82%B9%E3%83%88%E8%A9%B3%E7%B4%B0) に追記。
