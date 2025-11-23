@@ -1,6 +1,7 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
 import { logoutAction } from "@/features/auth/actions/logout";
 import { EditDisplayNameForm } from "@/features/profile/components/EditDisplayNameForm";
 import { SpaceSelector } from "@/features/space/components/SpaceSelector";

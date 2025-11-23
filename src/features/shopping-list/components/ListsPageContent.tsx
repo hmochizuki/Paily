@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+
 import { useSelectedSpace } from "@/hooks/useSelectedSpace";
-import {
-  toListOverviewViewModels,
-  type ListOverviewDto,
-} from "../types";
+
+import { type ListOverviewDto, toListOverviewViewModels } from "../types";
 import { CreateListButton } from "./CreateListButton";
 import { DeleteListButton } from "./DeleteListButton";
 

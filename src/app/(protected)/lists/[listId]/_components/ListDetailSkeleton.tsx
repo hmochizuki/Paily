@@ -1,3 +1,14 @@
+const LIST_SKELETON_KEYS = [
+  "list-skeleton-primary",
+  "list-skeleton-secondary",
+  "list-skeleton-tertiary",
+] as const;
+
+const COMPLETED_SKELETON_KEYS = [
+  "completed-skeleton-primary",
+  "completed-skeleton-secondary",
+] as const;
+
 export function ListDetailSkeleton() {
   return (
     <div className="space-y-6">
@@ -7,9 +18,9 @@ export function ListDetailSkeleton() {
       </div>
 
       <div className="space-y-3">
-        {Array.from({ length: 3 }).map((_, index) => (
+        {LIST_SKELETON_KEYS.map((key) => (
           <div
-            key={`list-skeleton-${index}`}
+            key={key}
             className="animate-pulse rounded-2xl border border-[var(--color-border-default)] bg-white p-4"
           >
             <div className="h-4 w-2/3 rounded bg-[var(--color-bg-muted)]" />
@@ -24,9 +35,9 @@ export function ListDetailSkeleton() {
       <div className="space-y-2 rounded-2xl border border-dashed border-[var(--color-border-default)] bg-white p-4">
         <div className="h-3 w-24 animate-pulse rounded bg-[var(--color-bg-muted)]" />
         <div className="space-y-2">
-          {Array.from({ length: 2 }).map((_, index) => (
+          {COMPLETED_SKELETON_KEYS.map((key) => (
             <div
-              key={`completed-skeleton-${index}`}
+              key={key}
               className="h-3 w-full animate-pulse rounded bg-[var(--color-bg-muted)]"
             />
           ))}

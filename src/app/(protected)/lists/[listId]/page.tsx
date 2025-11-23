@@ -1,8 +1,10 @@
 import { Suspense } from "react";
+
 import { prisma } from "@/lib/prisma";
+
+import { ListDetailSkeleton } from "./_components/ListDetailSkeleton";
 import { ListDetailContent } from "./ListDetailContent";
 import { ListDetailModalShell } from "./ListDetailModalShell";
-import { ListDetailSkeleton } from "./_components/ListDetailSkeleton";
 
 interface ListDetailPageProps {
   params: Promise<{

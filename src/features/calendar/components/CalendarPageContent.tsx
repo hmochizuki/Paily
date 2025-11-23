@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+
 import { useSelectedSpace } from "@/hooks/useSelectedSpace";
-import {
-  toCalendarEventViewModels,
-  type CalendarEventDto,
-} from "../types";
+
+import { type CalendarEventDto, toCalendarEventViewModels } from "../types";
 import { CalendarClient } from "./CalendarClient";
 
 interface CalendarPageContentProps {

@@ -1,16 +1,12 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatedLogo } from "@/common/ui/layout/SplashScreenGate/AnimatedLogo";
 
 const FADE_OUT_DURATION_MS = 600;
 const READY_FALLBACK_MS = 4500;
 
-type SplashScreenGateProps = {
-  readonly children: ReactNode;
-};
-
-export function SplashScreenGate({ children }: SplashScreenGateProps) {
+export function SplashScreenGate() {
   const [isVisible, setIsVisible] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const fadeTimerId = useRef<number | null>(null);
@@ -56,27 +52,26 @@ export function SplashScreenGate({ children }: SplashScreenGateProps) {
     };
   }, []);
 
+  if (!isVisible) {
+    return null;
+  }
+
   return (
-    <>
-      {children}
-      {isVisible ? (
-        <div
-          className="splash-screen"
-          data-hidden={isFadingOut ? "true" : "false"}
-          aria-live="polite"
-        >
-          <div className="splash-screen__backdrop" />
-          <div className="splash-screen__panel">
-            <AnimatedLogo size="lg" />
-            <div className="splash-screen__message">
-              <p className="splash-screen__title">Paily</p>
-              <p className="splash-screen__subtitle">
-                ふたりの暮らしを準備しています…
-              </p>
-            </div>
-          </div>
+    <div
+      className="splash-screen"
+      data-hidden={isFadingOut ? "true" : "false"}
+      aria-live="polite"
+    >
+      <div className="splash-screen__backdrop" />
+      <div className="splash-screen__panel">
+        <AnimatedLogo size="lg" />
+        <div className="splash-screen__message">
+          <p className="splash-screen__title">Paily</p>
+          <p className="splash-screen__subtitle">
+            ふたりの暮らしを準備しています…
+          </p>
         </div>
-      ) : null}
-    </>
+      </div>
+    </div>
   );
 }
