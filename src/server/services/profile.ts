@@ -3,7 +3,7 @@ import type { SpaceDto } from "@/features/space/types";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
 
-export type ProfileSettingsData = {
+type ProfileSettingsData = {
   profile: {
     displayName: string;
     gender: string | null;
@@ -70,8 +70,4 @@ const profileSettingsCache = unstable_cache(
 
 export async function getProfileSettingsData(userId: string) {
   return profileSettingsCache(userId);
-}
-
-export async function getProfileSettingsDataFresh(userId: string) {
-  return fetchProfileSettingsData(userId);
 }

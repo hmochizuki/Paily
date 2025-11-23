@@ -24,7 +24,7 @@ export type ShoppingListItemViewModel = ShoppingListItemCore & {
   isOptimistic?: boolean;
 };
 
-export function toShoppingListItemViewModel(
+function toShoppingListItemViewModel(
   dto: ShoppingListItemDto,
 ): ShoppingListItemViewModel {
   const { createdAt, state, ...rest } = dto;
@@ -56,9 +56,9 @@ interface ListOverviewCore {
 }
 
 export type ListOverviewDto = ReplaceDateWithString<ListOverviewCore>;
-export type ListOverviewViewModel = ListOverviewCore;
+type ListOverviewViewModel = ListOverviewCore;
 
-export function toListOverviewViewModel(
+function toListOverviewViewModel(
   dto: ListOverviewDto,
 ): ListOverviewViewModel {
   const { updatedAt, ...rest } = dto;

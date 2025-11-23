@@ -23,7 +23,7 @@ export type CalendarEventViewModel = CalendarEventCore & {
   isOptimistic?: boolean;
 };
 
-export function toCalendarEventViewModel(
+function toCalendarEventViewModel(
   dto: CalendarEventDto,
 ): CalendarEventViewModel {
   const { startAt, endAt, ...rest } = dto;

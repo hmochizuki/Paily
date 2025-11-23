@@ -10,14 +10,14 @@ import type { CalendarEventViewModel } from "../types";
 export type EventUpdateHandler = (formData: FormData) => Promise<void>;
 export type EventDeleteHandler = (eventId: string) => Promise<void>;
 
-export interface EventDetailModalProps {
+interface EventDetailModalProps {
   event: CalendarEventViewModel;
   onClose: () => void;
   onUpdate?: EventUpdateHandler;
   onDelete?: EventDeleteHandler;
 }
 
-export interface EventDetailContentProps extends EventDetailModalProps {
+interface EventDetailContentProps extends EventDetailModalProps {
   className?: string;
   onBack?: () => void;
 }
@@ -249,26 +249,6 @@ export function EventDetailContent({
           </button>
         </div>
       </form>
-    </div>
-  );
-}
-
-export function EventDetailModal({
-  event,
-  onClose,
-  onUpdate,
-  onDelete,
-}: EventDetailModalProps) {
-  return (
-    <div className="fixed inset-0 z-[var(--z-index-modal-backdrop)] flex items-center justify-center bg-black/50">
-      <div className="z-[var(--z-index-modal)] max-h-[90vh] w-[90%] max-w-md overflow-y-auto rounded-lg bg-white p-6">
-        <EventDetailContent
-          event={event}
-          onClose={onClose}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-        />
-      </div>
     </div>
   );
 }

@@ -32,12 +32,11 @@ pnpm supabase:restart  # ローカルSupabaseの再起動
 
 ### コード品質
 ```bash
-pnpm lint           # Biomeでのリントチェック
-pnpm format         # Biomeでのコードフォーマット
-pnpm tsc            # TypeScriptの型チェック
-pnpm unused:check   # 未使用のexportやファイルをチェック
-pnpm unused:fix     # 未使用のexportやファイルを削除
-pnpm ci             # フォーマット、リント、型チェックを連続実行
+pnpm lint     # Biomeでのリントチェック
+pnpm format   # Biomeでのコードフォーマット
+pnpm tsc      # TypeScriptの型チェック
+pnpm tsr      # 未使用のexportやファイルを削除
+pnpm ci       # フォーマット、リント、型チェックを連続実行
 ```
 
 ## ドキュメント運用
@@ -137,8 +136,8 @@ z-indexは必ずCSS変数として`globals.css`で定義し、グローバルに
 
 ### コード品質管理
 - **Biome**: リンターおよびフォーマッターとして使用
-- **ts-remove-unused**: 未使用のexportやファイルを検出・削除
-  - 定期的に`pnpm unused:check`で確認し、`pnpm unused:fix`でクリーンアップすること
+- **tsr**: 未使用のexportやファイルを検出・削除
+  - 定期的に`pnpm tsr`でクリーンアップすること
 - TypeScript strictモードを有効化（`tsconfig.json`）
 - `@/*` エイリアスを`src/*`に設定
 - VSCode設定で保存時自動フォーマット（`.vscode/settings.json`）

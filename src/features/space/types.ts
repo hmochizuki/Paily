@@ -13,7 +13,7 @@ interface SpaceCore {
 export type SpaceDto = ReplaceDateWithString<SpaceCore>;
 export type SpaceViewModel = SpaceCore;
 
-export function toSpaceViewModel(dto: SpaceDto): SpaceViewModel {
+function toSpaceViewModel(dto: SpaceDto): SpaceViewModel {
   const { createdAt, ...rest } = dto;
   return {
     ...rest,

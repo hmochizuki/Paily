@@ -3,7 +3,7 @@ import type { ShoppingListItemDto } from "@/features/shopping-list/types";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
 
-export type ListOverviewDto = {
+type ListOverviewDto = {
   id: string;
   title: string;
   coupleId: string;
@@ -12,7 +12,7 @@ export type ListOverviewDto = {
   uncheckedItemCount: number;
 };
 
-export type ListsData = {
+type ListsData = {
   userSpaceIds: string[];
   lists: ListOverviewDto[];
 };
@@ -65,11 +65,7 @@ export async function getListsData(userId: string) {
   return listsDataCache(userId);
 }
 
-export async function getListsDataFresh(userId: string) {
-  return fetchListsData(userId);
-}
-
-export type ListDetailData = {
+type ListDetailData = {
   listId: string;
   coupleId: string;
   items: ShoppingListItemDto[];
@@ -160,8 +156,4 @@ const listDetailDataCache = unstable_cache(
 
 export async function getListDetailData(userId: string, listId: string) {
   return listDetailDataCache(userId, listId);
-}
-
-export async function getListDetailDataFresh(userId: string, listId: string) {
-  return fetchListDetailData(userId, listId);
 }

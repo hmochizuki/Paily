@@ -12,9 +12,10 @@
     "supabase:stop": "supabase stop",
     "supabase:restart": "supabase restart",
     "start": "next start",
-    "lint": "biome check",
+    "lint": "biome check --write ./src",
     "format": "biome format --write",
     "tsc": "tsc --noEmit",
+    "tsr": "tsr --write 'next\\.config\\.ts$' 'vitest\\.config\\.ts$' 'src/env\\.ts$' 'src/app/.*page\\.tsx$' 'src/app/.*layout\\.tsx$' 'src/app/.*route\\.ts$' 'src/.*\\.test\\.(ts|tsx)$' '\\.next/types/validator\\.ts$'",
     "ci": "pnpm format && pnpm lint && pnpm tsc"
   },
   "dependencies": {
@@ -40,6 +41,7 @@
     "jsdom": "27.2.0",
     "prisma": "6.16.2",
     "tailwindcss": "4.1.13",
+    "tsr": "1.3.4",
     "typescript": "5.9.2",
     "vitest": "4.0.9"
   }

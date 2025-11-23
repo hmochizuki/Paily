@@ -3,7 +3,7 @@ import type { CalendarEventDto } from "@/features/calendar/types";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TTL_SECONDS } from "@/server/cache/policy";
 
-export type CalendarData = {
+type CalendarData = {
   events: CalendarEventDto[];
   userSpaceIds: string[];
   profileDisplayName: string | null;
@@ -72,8 +72,4 @@ const calendarDataCache = unstable_cache(fetchCalendarData, ["calendar-data"], {
 
 export async function getCalendarData(userId: string) {
   return calendarDataCache(userId);
-}
-
-export async function getCalendarDataFresh(userId: string) {
-  return fetchCalendarData(userId);
 }
