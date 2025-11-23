@@ -10,13 +10,11 @@ import { CalendarClient } from "./CalendarClient";
 interface CalendarPageContentProps {
   allEventsDto: CalendarEventDto[];
   userSpaceIds: string[];
-  currentUserDisplayName: string;
 }
 
 export function CalendarPageContent({
   allEventsDto,
   userSpaceIds,
-  currentUserDisplayName,
 }: CalendarPageContentProps) {
   const { selectedSpaceId, selectSpace, isLoading } = useSelectedSpace();
   const [currentSpaceId, setCurrentSpaceId] = useState<string | null>(null);
@@ -53,11 +51,7 @@ export function CalendarPageContent({
 
   return (
     <div className="flex h-full flex-1 flex-col">
-      <CalendarClient
-        coupleId={currentSpaceId}
-        initialEvents={events}
-        currentUserDisplayName={currentUserDisplayName}
-      />
+      <CalendarClient coupleId={currentSpaceId} events={events} />
     </div>
   );
 }

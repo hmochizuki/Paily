@@ -1,74 +1,111 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { createEventAction } from "@/server/handlers/calendarHandler";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
+import {
+  deleteEventAction,
+  updateEventAction,
+} from "@/server/handlers/calendarHandler";
 import { EVENT_COLORS } from "../constants";
+import { formatDateForInput, formatTimeForInput } from "../utils/dateUtils";
 
-type EventFormSubmitHandler = (formData: FormData) => Promise<void>;
-
-interface EventFormModalProps {
-  coupleId: string;
-  initialDate: Date;
-  onClose: () => void;
-  onSubmit?: EventFormSubmitHandler;
+interface EventEditFormProps {
+  event: {
+    id: string;
+    title: string;
+    description: string | null;
+    startAt: string;
+    endAt: string | null;
+    isAllDay: boolean;
+    color: string | null;
+  };
+  returnTo: string;
 }
 
-function formatDateForInput(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function formatTimeForInput(date: Date): string {
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-}
-
-export function EventFormModal({
-  coupleId,
-  initialDate,
-  onClose,
-  onSubmit,
-}: EventFormModalProps) {
+export function EventEditForm({ event, returnTo }: EventEditFormProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [isAllDay, setIsAllDay] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("pink");
-  const submitHandler = onSubmit ?? createEventAction;
-  const formattedInitialDate = formatDateForInput(initialDate);
-  const formattedInitialTime = formatTimeForInput(initialDate);
+  const [isDeleting, startDeleteTransition] = useTransition();
+  const [isAllDay, setIsAllDay] = useState(event.isAllDay);
+  const [selectedColor, setSelectedColor] = useState(event.color ?? "pink");
+  const startAt = useMemo(() => new Date(event.startAt), [event.startAt]);
+  const endAt = useMemo(
+    () => (event.endAt ? new Date(event.endAt) : null),
+    [event.endAt],
+  );
+  const returnTarget = returnTo || "/calendar";
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
-      await submitHandler(formData);
-      onClose();
+      await updateEventAction(formData);
+      router.push(returnTarget);
     });
   };
 
+  const handleDelete = () => {
+    if (!confirm("このイベントを削除しますか？")) {
+      return;
+    }
+    startDeleteTransition(async () => {
+      await deleteEventAction(event.id);
+      router.push(returnTarget);
+    });
+  };
+
+  const handleBack = () => {
+    router.push(returnTarget);
+  };
+
   return (
-    <div className="fixed inset-0 z-[var(--z-index-modal-backdrop)] flex items-center justify-center bg-black/50">
-      <div className="z-[var(--z-index-modal)] max-h-[90vh] w-[90%] max-w-md overflow-y-auto rounded-lg bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-[var(--color-text-default)]">
-          新しいイベント
-        </h2>
+    <div className="flex min-h-screen flex-col bg-white">
+      <header className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="rounded-full p-2 text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)]"
+          aria-label="戻る"
+          disabled={isPending || isDeleting}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-5"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5 8.25 12l7.5-7.5"
+            />
+          </svg>
+        </button>
+        <h1 className="text-base font-semibold text-[var(--color-text-default)]">
+          イベントを編集
+        </h1>
+        <div className="size-9" />
+      </header>
+
+      <main className="flex-1 overflow-y-auto px-4 pb-10 pt-4">
         <form action={handleSubmit} className="space-y-4">
-          <input type="hidden" name="coupleId" value={coupleId} />
+          <input type="hidden" name="eventId" value={event.id} />
           <input type="hidden" name="isAllDay" value={isAllDay.toString()} />
           <input type="hidden" name="color" value={selectedColor} />
 
           <div>
             <label
-              htmlFor="modal-title"
+              htmlFor="edit-title"
               className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
             >
               タイトル
             </label>
             <input
-              id="modal-title"
+              id="edit-title"
               name="title"
               type="text"
-              placeholder="例: デート"
+              defaultValue={event.title}
               className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
               required
             />
@@ -76,15 +113,15 @@ export function EventFormModal({
 
           <div>
             <label
-              htmlFor="modal-description"
+              htmlFor="edit-description"
               className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
             >
               メモ
             </label>
             <textarea
-              id="modal-description"
+              id="edit-description"
               name="description"
-              placeholder="詳細を入力..."
+              defaultValue={event.description ?? ""}
               rows={3}
               className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
             />
@@ -92,14 +129,14 @@ export function EventFormModal({
 
           <div className="flex items-center gap-2">
             <input
-              id="modal-isAllDay"
+              id="edit-isAllDay"
               type="checkbox"
               checked={isAllDay}
-              onChange={(event) => setIsAllDay(event.target.checked)}
+              onChange={(e) => setIsAllDay(e.target.checked)}
               className="size-4 rounded border-[var(--color-border-default)]"
             />
             <label
-              htmlFor="modal-isAllDay"
+              htmlFor="edit-isAllDay"
               className="text-sm text-[var(--color-text-default)]"
             >
               終日
@@ -109,16 +146,16 @@ export function EventFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
-                htmlFor="modal-startDate"
+                htmlFor="edit-startDate"
                 className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
               >
                 開始日
               </label>
               <input
-                id="modal-startDate"
+                id="edit-startDate"
                 name="startDate"
                 type="date"
-                defaultValue={formattedInitialDate}
+                defaultValue={formatDateForInput(startAt)}
                 className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
                 required
               />
@@ -126,16 +163,16 @@ export function EventFormModal({
             {!isAllDay && (
               <div>
                 <label
-                  htmlFor="modal-startTime"
+                  htmlFor="edit-startTime"
                   className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
                 >
                   開始時間
                 </label>
                 <input
-                  id="modal-startTime"
+                  id="edit-startTime"
                   name="startTime"
                   type="time"
-                  defaultValue={formattedInitialTime}
+                  defaultValue={formatTimeForInput(startAt)}
                   className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
                 />
               </div>
@@ -145,30 +182,32 @@ export function EventFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
-                htmlFor="modal-endDate"
+                htmlFor="edit-endDate"
                 className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
               >
                 終了日
               </label>
               <input
-                id="modal-endDate"
+                id="edit-endDate"
                 name="endDate"
                 type="date"
+                defaultValue={endAt ? formatDateForInput(endAt) : ""}
                 className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
               />
             </div>
             {!isAllDay && (
               <div>
                 <label
-                  htmlFor="modal-endTime"
+                  htmlFor="edit-endTime"
                   className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
                 >
                   終了時間
                 </label>
                 <input
-                  id="modal-endTime"
+                  id="edit-endTime"
                   name="endTime"
                   type="time"
+                  defaultValue={endAt ? formatTimeForInput(endAt) : ""}
                   className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
                 />
               </div>
@@ -192,25 +231,25 @@ export function EventFormModal({
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-between gap-2 pt-4">
             <button
               type="button"
-              onClick={onClose}
-              className="rounded-lg border border-[var(--color-border-default)] px-4 py-2 text-sm font-medium text-[var(--color-text-default)] transition-colors hover:bg-[var(--color-bg-subtle)]"
-              disabled={isPending}
+              onClick={handleDelete}
+              className="flex-1 rounded-lg border border-[var(--color-danger)] px-4 py-2 text-sm font-medium text-[var(--color-danger)] hover:bg-red-50 disabled:opacity-50"
+              disabled={isPending || isDeleting}
             >
-              キャンセル
+              {isDeleting ? "削除中..." : "削除"}
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] transition-colors hover:bg-[var(--color-brand-hover)] disabled:opacity-50"
-              disabled={isPending}
+              className="flex-1 rounded-lg bg-[var(--color-brand)] px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] hover:bg-[var(--color-brand-hover)] disabled:opacity-50"
+              disabled={isPending || isDeleting}
             >
-              {isPending ? "作成中..." : "作成"}
+              {isPending ? "保存中..." : "保存"}
             </button>
           </div>
         </form>
-      </div>
+      </main>
     </div>
   );
 }

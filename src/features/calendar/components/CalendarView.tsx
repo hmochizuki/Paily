@@ -1,16 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { CalendarEventViewModel } from "../types";
-import { DayDetailModal } from "./DayDetailModal";
-import { EventFormModal } from "./EventFormModal";
+import { formatDateKey, isEventOnDate } from "../utils/dateUtils";
 
 interface CalendarViewProps {
   events: CalendarEventViewModel[];
   coupleId: string;
-  onCreateEvent: (formData: FormData) => Promise<void>;
-  onUpdateEvent: (formData: FormData) => Promise<void>;
-  onDeleteEvent: (eventId: string) => Promise<void>;
 }
 
 function getDaysInMonth(year: number, month: number): Date[] {
@@ -44,21 +41,6 @@ function isSameDay(date1: Date, date2: Date): boolean {
   );
 }
 
-function isEventOnDate(event: CalendarEventViewModel, date: Date): boolean {
-  const eventStart = new Date(event.startAt.getTime());
-  eventStart.setHours(0, 0, 0, 0);
-
-  const eventEnd = event.endAt
-    ? new Date(event.endAt.getTime())
-    : new Date(event.startAt.getTime());
-  eventEnd.setHours(23, 59, 59, 999);
-
-  const checkDate = new Date(date);
-  checkDate.setHours(12, 0, 0, 0);
-
-  return checkDate >= eventStart && checkDate <= eventEnd;
-}
-
 const COLOR_CLASSES: Record<string, string> = {
   pink: "bg-pink-400",
   red: "bg-red-400",
@@ -69,23 +51,10 @@ const COLOR_CLASSES: Record<string, string> = {
   purple: "bg-purple-400",
 };
 
-const DETAIL_MODAL_TRANSITION_MS = 300;
-
-export function CalendarView({
-  events,
-  coupleId,
-  onCreateEvent,
-  onUpdateEvent,
-  onDeleteEvent,
-}: CalendarViewProps) {
+export function CalendarView({ events, coupleId }: CalendarViewProps) {
+  const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [modalDate, setModalDate] = useState<Date | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [detailModalState, setDetailModalState] = useState<{
-    date: Date;
-    isOpen: boolean;
-  } | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -101,57 +70,24 @@ export function CalendarView({
   };
 
   const goToToday = () => {
-    setCurrentDate(new Date());
+    const now = new Date();
+    setCurrentDate(now);
+    setSelectedDate(now);
   };
 
-  const detailModalDate = detailModalState?.date ?? null;
-  const detailDateEvents = detailModalDate
-    ? events.filter((event) => isEventOnDate(event, detailModalDate))
-    : [];
-  const selectedDetailEvent = selectedEventId
-    ? (events.find((event) => event.id === selectedEventId) ?? null)
-    : null;
-
-  const openDetailModal = (date: Date) => {
-    setSelectedEventId(null);
-    setDetailModalState({ date, isOpen: true });
+  const openDayDetail = (date: Date) => {
+    const dateKey = formatDateKey(date);
+    const params = new URLSearchParams({ spaceId: coupleId });
+    router.push(`/calendar/days/${dateKey}?${params.toString()}`);
   };
-
-  const closeDetailModal = () => {
-    setDetailModalState((prev) => (prev ? { ...prev, isOpen: false } : null));
-    setSelectedEventId(null);
-  };
-
-  useEffect(() => {
-    if (!detailModalState || detailModalState.isOpen) {
-      return;
-    }
-    const timeout = window.setTimeout(() => {
-      setDetailModalState(null);
-    }, DETAIL_MODAL_TRANSITION_MS);
-    return () => {
-      window.clearTimeout(timeout);
-    };
-  }, [detailModalState]);
 
   const handleDateClick = (date: Date) => {
     if (selectedDate && isSameDay(selectedDate, date)) {
-      openDetailModal(date);
+      openDayDetail(date);
     } else {
       setSelectedDate(date);
-      closeDetailModal();
     }
   };
-
-  useEffect(() => {
-    if (!selectedEventId) {
-      return;
-    }
-    const exists = events.some((event) => event.id === selectedEventId);
-    if (!exists) {
-      setSelectedEventId(null);
-    }
-  }, [events, selectedEventId]);
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4">
@@ -245,7 +181,7 @@ export function CalendarView({
               isEventOnDate(event, date),
             );
             const dayOfWeek = date.getDay();
-            const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+            const dateKey = formatDateKey(date);
 
             return (
               <button
@@ -276,7 +212,7 @@ export function CalendarView({
                     {dayEvents.slice(0, 2).map((event) => (
                       <div
                         key={event.id}
-                        className={`truncate rounded px-1 text-[10px] text-white ${COLOR_CLASSES[event.color ?? "pink"] ?? "bg-pink-400"} ${event.isOptimistic ? "opacity-70" : "opacity-100"}`}
+                        className={`truncate rounded px-1 text-[10px] text-white ${COLOR_CLASSES[event.color ?? "pink"] ?? "bg-pink-400"}`}
                       >
                         {event.title}
                       </div>
@@ -293,37 +229,6 @@ export function CalendarView({
           })}
         </div>
       </div>
-
-      {modalDate && (
-        <EventFormModal
-          coupleId={coupleId}
-          initialDate={modalDate}
-          onClose={() => setModalDate(null)}
-          onSubmit={async (formData) => {
-            await onCreateEvent(formData);
-          }}
-        />
-      )}
-
-      {detailModalState && detailModalDate && (
-        <DayDetailModal
-          date={detailModalDate}
-          events={detailDateEvents}
-          isOpen={detailModalState.isOpen}
-          onClose={closeDetailModal}
-          selectedEvent={selectedDetailEvent}
-          onSelectEvent={(event) => {
-            setSelectedEventId(event.id);
-          }}
-          onBackToList={() => setSelectedEventId(null)}
-          onAddEvent={() => {
-            setModalDate(detailModalDate);
-            closeDetailModal();
-          }}
-          onUpdateEvent={onUpdateEvent}
-          onDeleteEvent={onDeleteEvent}
-        />
-      )}
     </div>
   );
 }

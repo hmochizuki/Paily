@@ -19,6 +19,36 @@ type CalendarData = {
   profileDisplayName: string | null;
 };
 
+type EventRecord = {
+  id: string;
+  title: string;
+  description: string | null;
+  startAt: Date;
+  endAt: Date | null;
+  isAllDay: boolean;
+  color: string | null;
+  coupleId: string;
+  createdBy?: {
+    displayName: string | null;
+  } | null;
+};
+
+function buildCalendarEventDto(event: EventRecord): CalendarEventDto {
+  return {
+    id: event.id,
+    title: event.title,
+    description: event.description,
+    startAt: event.startAt.toISOString(),
+    endAt: event.endAt ? event.endAt.toISOString() : null,
+    isAllDay: event.isAllDay,
+    color: event.color,
+    coupleId: event.coupleId,
+    createdBy: {
+      displayName: event.createdBy?.displayName ?? "メンバー",
+    },
+  };
+}
+
 async function fetchCalendarData(userId: string): Promise<CalendarData> {
   const profilePromise = findProfileDisplayName(userId);
   const partnersPromise = listCouplePartnersByProfileId(userId);
@@ -40,19 +70,9 @@ async function fetchCalendarData(userId: string): Promise<CalendarData> {
 
   const eventsData = await findEventsByCoupleIds(userSpaceIds);
 
-  const events: CalendarEventDto[] = eventsData.map((event) => ({
-    id: event.id,
-    title: event.title,
-    description: event.description,
-    startAt: event.startAt.toISOString(),
-    endAt: event.endAt ? event.endAt.toISOString() : null,
-    isAllDay: event.isAllDay,
-    color: event.color,
-    coupleId: event.coupleId,
-    createdBy: {
-      displayName: event.createdBy?.displayName ?? "メンバー",
-    },
-  }));
+  const events: CalendarEventDto[] = eventsData.map((event) =>
+    buildCalendarEventDto(event),
+  );
 
   return {
     events,
@@ -200,4 +220,25 @@ export async function deleteCalendarEvent(params: {
     throw new Error("このイベントを削除する権限がありません");
   }
   await deleteEvent(params.eventId);
+}
+
+export async function getCalendarEventForUser(params: {
+  userId: string;
+  eventId: string;
+}) {
+  const event = await findEventById(params.eventId);
+
+  if (!event) {
+    return null;
+  }
+
+  const hasAccess = event.couple.partners.some(
+    (partner) => partner.profileId === params.userId,
+  );
+
+  if (!hasAccess) {
+    throw new Error("このイベントにアクセスする権限がありません");
+  }
+
+  return buildCalendarEventDto(event);
 }

@@ -27,14 +27,10 @@ async function CalendarDataSection() {
     return <NoSpaceMessage />;
   }
 
-  const currentUserDisplayName =
-    cached.profileDisplayName ?? user.email ?? "あなた";
-
   return (
     <CalendarPageContent
       allEventsDto={cached.events}
       userSpaceIds={cached.userSpaceIds}
-      currentUserDisplayName={currentUserDisplayName}
     />
   );
 }

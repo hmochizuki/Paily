@@ -30,6 +30,9 @@ export function findEventById(eventId: string) {
           partners: true,
         },
       },
+      createdBy: {
+        select: { displayName: true },
+      },
     },
   });
 }

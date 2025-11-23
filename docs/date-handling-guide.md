@@ -119,7 +119,7 @@ return <AccountCard createdAt={viewModel.createdAt.toLocaleDateString('ja-JP')} 
 - `src/server/services/calendar.ts`: カレンダーイベントを DTO 化し、`startAt`/`endAt` を string で返却。
 - `src/features/calendar/types.ts`: イベント DTO/ ViewModel と変換関数 (`toCalendarEventViewModels`) を提供。
 - `src/features/calendar/components/CalendarPageContent.tsx` / `CalendarClient.tsx`: DTO を受け取ってクライアントで Date に変換し、以降の UI/楽観的更新は Date を信頼。
-- `src/features/calendar/components/EventCard.tsx` / `EventDetailModal.tsx` / `CalendarView.tsx`: ViewModel が Date である前提に書き換え、`toLocaleDateString`/`toLocaleTimeString` が常に安全に動くよう統一。
+- `src/features/calendar/components/EventCard.tsx` / `EventEditForm.tsx` / `CalendarView.tsx`: ViewModel が Date である前提に書き換え、`toLocaleDateString`/`toLocaleTimeString` が常に安全に動くよう統一。
 - `src/server/services/profile.ts`: プロフィールのスペース情報を `SpaceDto` として返し、`createdAt` を string に正規化。
 - `src/features/space/types.ts` / `components/SpaceSelector.tsx`: スペース DTO を Date に復元し、表示系・自動選択ロジックが環境差異の影響を受けないようにした。
 

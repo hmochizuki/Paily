@@ -1,25 +1,17 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { NativeModal } from "@/common/ui/NativeModal";
 import type { CalendarEventViewModel } from "../types";
 import { EventCard } from "./EventCard";
-import {
-  type EventDeleteHandler,
-  EventDetailContent,
-  type EventUpdateHandler,
-} from "./EventDetailModal";
 
 interface DayDetailModalProps {
   date: Date;
   events: CalendarEventViewModel[];
   isOpen: boolean;
   onClose: () => void;
-  selectedEvent: CalendarEventViewModel | null;
-  onSelectEvent: (event: CalendarEventViewModel) => void;
-  onBackToList: () => void;
   onAddEvent: () => void;
-  onUpdateEvent: EventUpdateHandler;
-  onDeleteEvent: EventDeleteHandler;
+  onEditEvent: (eventId: string) => void;
 }
 
 function formatDisplayDate(date: Date): string {
@@ -31,17 +23,32 @@ export function DayDetailModal({
   events,
   isOpen,
   onClose,
-  selectedEvent,
-  onSelectEvent,
-  onBackToList,
   onAddEvent,
-  onUpdateEvent,
-  onDeleteEvent,
+  onEditEvent,
 }: DayDetailModalProps) {
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!selectedEventId) {
+      return;
+    }
+    const exists = events.some((event) => event.id === selectedEventId);
+    if (!exists) {
+      setSelectedEventId(null);
+    }
+  }, [events, selectedEventId]);
+
+  const selectedEvent =
+    events.find((event) => event.id === selectedEventId) ?? null;
+
+  const handleClose = () => {
+    setSelectedEventId(null);
+    onClose();
+  };
+
   return (
     <NativeModal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       placement="bottom"
       contentClassName="max-h-full overflow-y-auto"
     >
@@ -74,7 +81,7 @@ export function DayDetailModal({
           )}
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-full p-2 text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)]"
             aria-label="閉じる"
           >
@@ -92,17 +99,7 @@ export function DayDetailModal({
           </button>
         </div>
       </div>
-
-      {selectedEvent ? (
-        <EventDetailContent
-          event={selectedEvent}
-          onClose={onClose}
-          onBack={onBackToList}
-          onUpdate={onUpdateEvent}
-          onDelete={onDeleteEvent}
-          className="space-y-4"
-        />
-      ) : events.length === 0 ? (
+      {events.length === 0 ? (
         <p className="rounded-lg border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-3 py-6 text-center text-sm text-[var(--color-text-muted)]">
           この日の予定はありません。プラスボタンから追加できます。
         </p>
@@ -112,7 +109,7 @@ export function DayDetailModal({
             <EventCard
               key={event.id}
               event={event}
-              onClick={() => onSelectEvent(event)}
+              onClick={() => onEditEvent(event.id)}
             />
           ))}
         </div>
