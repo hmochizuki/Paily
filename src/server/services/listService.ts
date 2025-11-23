@@ -7,7 +7,7 @@ import {
 } from "@/server/repositories/coupleRepository";
 import { findProfileDisplayName } from "@/server/repositories/profileRepository";
 import {
-  findRecentLabelsByCoupleId,
+  findRecentLabelsByShoppingListId,
   findShoppingListDetail,
   findShoppingListsByCoupleIds,
   findShoppingListTitle,
@@ -109,7 +109,7 @@ async function fetchListDetailData(
         }
       : null,
   }));
-  const recentLabels = await findRecentLabelsByCoupleId(list.coupleId);
+  const recentLabels = await findRecentLabelsByShoppingListId(list.id);
 
   const currentUserDisplayName = profile?.displayName ?? "あなた";
 

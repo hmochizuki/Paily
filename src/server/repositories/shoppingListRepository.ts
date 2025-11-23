@@ -121,11 +121,14 @@ export function upsertShoppingListItemState(
   });
 }
 
-export async function findRecentLabelsByCoupleId(coupleId: string, limit = 30) {
+export async function findRecentLabelsByShoppingListId(
+  listId: string,
+  limit = 30,
+) {
   const grouped = await prisma.shoppingListItem.groupBy({
     by: ["label"],
     where: {
-      coupleId,
+      listId,
       label: {
         not: null,
       },
