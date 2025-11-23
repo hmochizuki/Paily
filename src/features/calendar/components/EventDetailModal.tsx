@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteEventAction } from "../actions/deleteEvent";
 import { updateEventAction } from "../actions/updateEvent";
+import { EVENT_COLORS } from "../constants";
 import type { CalendarEventViewModel } from "../types";
 
 export type EventUpdateHandler = (formData: FormData) => Promise<void>;
@@ -20,16 +21,6 @@ export interface EventDetailContentProps extends EventDetailModalProps {
   className?: string;
   onBack?: () => void;
 }
-
-const EVENT_COLORS = [
-  { value: "pink", label: "ピンク", class: "bg-pink-400" },
-  { value: "red", label: "レッド", class: "bg-red-400" },
-  { value: "orange", label: "オレンジ", class: "bg-orange-400" },
-  { value: "yellow", label: "イエロー", class: "bg-yellow-400" },
-  { value: "green", label: "グリーン", class: "bg-green-400" },
-  { value: "blue", label: "ブルー", class: "bg-blue-400" },
-  { value: "purple", label: "パープル", class: "bg-purple-400" },
-];
 
 function formatDateForInput(date: Date): string {
   const year = date.getFullYear();

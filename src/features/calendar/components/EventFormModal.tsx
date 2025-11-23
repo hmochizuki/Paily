@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { createEventAction } from "../actions/createEvent";
+import { EVENT_COLORS } from "../constants";
 
 type EventFormSubmitHandler = (formData: FormData) => Promise<void>;
 
@@ -19,6 +20,12 @@ function formatDateForInput(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function formatTimeForInput(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
 export function EventFormModal({
   coupleId,
   initialDate,
@@ -26,7 +33,11 @@ export function EventFormModal({
   onSubmit,
 }: EventFormModalProps) {
   const [isPending, startTransition] = useTransition();
+  const [isAllDay, setIsAllDay] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("pink");
   const submitHandler = onSubmit ?? createEventAction;
+  const formattedInitialDate = formatDateForInput(initialDate);
+  const formattedInitialTime = formatTimeForInput(initialDate);
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -43,8 +54,8 @@ export function EventFormModal({
         </h2>
         <form action={handleSubmit} className="space-y-4">
           <input type="hidden" name="coupleId" value={coupleId} />
-          <input type="hidden" name="isAllDay" value="false" />
-          <input type="hidden" name="color" value="pink" />
+          <input type="hidden" name="isAllDay" value={isAllDay.toString()} />
+          <input type="hidden" name="color" value={selectedColor} />
 
           <div>
             <label
@@ -79,6 +90,22 @@ export function EventFormModal({
             />
           </div>
 
+          <div className="flex items-center gap-2">
+            <input
+              id="modal-isAllDay"
+              type="checkbox"
+              checked={isAllDay}
+              onChange={(event) => setIsAllDay(event.target.checked)}
+              className="size-4 rounded border-[var(--color-border-default)]"
+            />
+            <label
+              htmlFor="modal-isAllDay"
+              className="text-sm text-[var(--color-text-default)]"
+            >
+              終日
+            </label>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
@@ -91,24 +118,77 @@ export function EventFormModal({
                 id="modal-startDate"
                 name="startDate"
                 type="date"
-                defaultValue={formatDateForInput(initialDate)}
+                defaultValue={formattedInitialDate}
                 className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
                 required
               />
             </div>
+            {!isAllDay && (
+              <div>
+                <label
+                  htmlFor="modal-startTime"
+                  className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+                >
+                  開始時間
+                </label>
+                <input
+                  id="modal-startTime"
+                  name="startTime"
+                  type="time"
+                  defaultValue={formattedInitialTime}
+                  className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label
-                htmlFor="modal-startTime"
+                htmlFor="modal-endDate"
                 className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
               >
-                開始時間
+                終了日
               </label>
               <input
-                id="modal-startTime"
-                name="startTime"
-                type="time"
+                id="modal-endDate"
+                name="endDate"
+                type="date"
                 className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
               />
+            </div>
+            {!isAllDay && (
+              <div>
+                <label
+                  htmlFor="modal-endTime"
+                  className="mb-1 block text-sm font-medium text-[var(--color-text-default)]"
+                >
+                  終了時間
+                </label>
+                <input
+                  id="modal-endTime"
+                  name="endTime"
+                  type="time"
+                  className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <span className="mb-2 block text-sm font-medium text-[var(--color-text-default)]">
+              カラー
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {EVENT_COLORS.map((colorOption) => (
+                <button
+                  key={colorOption.value}
+                  type="button"
+                  onClick={() => setSelectedColor(colorOption.value)}
+                  className={`size-8 rounded-full ${colorOption.class} ${selectedColor === colorOption.value ? "ring-2 ring-[var(--color-text-default)] ring-offset-2" : ""}`}
+                  aria-label={colorOption.label}
+                />
+              ))}
             </div>
           </div>
 

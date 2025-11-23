@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+## 言語
+
+常に日本語を使用してください。
+
 ## プロジェクト構造とモジュール配置
 `src/app` は Next.js App Router のルートで、ページ、レイアウト、ルーティングミドルウェアを集約します。`src/features` はドメインごとの UI/状態管理、`src/common` はデザインシステムやベースレイアウト、`src/lib` と `src/server` は Prisma クライアント、Supabase セッション、サーバーアクションをレイヤー分離しています。再利用可能な型は `src/types`、ユーティリティは `src/utils`。永続化の定義は `prisma/schema.prisma`、公開アセットは `public/`、Supabase のローカル設定は `supabase/` にあります。学習・仕様の一次情報は `docs/README.md` 以下にあり、更新時は必ずリンクを追記してください。
 
