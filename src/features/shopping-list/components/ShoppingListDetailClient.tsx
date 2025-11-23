@@ -7,6 +7,7 @@ import {
   useMemo,
   useOptimistic,
   useRef,
+  useState,
 } from "react";
 import {
   addItemAction,
@@ -63,6 +64,7 @@ interface ShoppingListDetailClientProps {
   coupleId: string;
   initialItemsDto: ShoppingListItemDto[];
   currentUserDisplayName: string;
+  recentLabels: string[];
 }
 
 export function ShoppingListDetailClient({
@@ -70,6 +72,7 @@ export function ShoppingListDetailClient({
   coupleId,
   initialItemsDto,
   currentUserDisplayName,
+  recentLabels,
 }: ShoppingListDetailClientProps) {
   const initialViewModels = useMemo(
     () => toShoppingListItemViewModels(initialItemsDto),
@@ -81,6 +84,7 @@ export function ShoppingListDetailClient({
     OptimisticAction
   >(initialViewModels, optimisticReducer);
   const serverSnapshotRef = useRef(initialViewModels);
+  const [labelSuggestions, setLabelSuggestions] = useState(recentLabels);
 
   useEffect(() => {
     serverSnapshotRef.current = initialViewModels;
@@ -141,6 +145,15 @@ export function ShoppingListDetailClient({
 
     try {
       await addItemAction(formData);
+      if (label) {
+        setLabelSuggestions((prev) => {
+          if (prev.includes(label)) {
+            return prev;
+          }
+          const next = [label, ...prev];
+          return next.slice(0, 30);
+        });
+      }
       refreshAfterMutation();
     } catch (error) {
       console.error("アイテムの追加に失敗しました", error);
@@ -195,6 +208,7 @@ export function ShoppingListDetailClient({
       <AddItemForm
         listId={listId}
         coupleId={coupleId}
+        labelSuggestions={labelSuggestions}
         onSubmit={handleAddItem}
       />
 

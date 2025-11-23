@@ -31,6 +31,7 @@ export async function ListDetailContent({ listId }: ListDetailContentProps) {
         coupleId={cached.coupleId}
         initialItemsDto={cached.items}
         currentUserDisplayName={cached.currentUserDisplayName}
+        recentLabels={cached.recentLabels}
       />
     </div>
   );
