@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { EventEditForm } from "@/features/calendar/components/EventEditForm";
 import { requireUser } from "@/lib/auth";
 import { getCalendarEventForUser } from "@/server/services/calendarService";
+import { EventDetailPushScreen } from "./EventDetailPushScreen";
 
 interface EventEditPageProps {
   params: Promise<{
@@ -32,6 +33,8 @@ export default async function EventEditPage({
   }
 
   return (
-    <EventEditForm event={event} returnTo={search.returnTo ?? "/calendar"} />
+    <EventDetailPushScreen>
+      <EventEditForm event={event} returnTo={search.returnTo ?? "/calendar"} />
+    </EventDetailPushScreen>
   );
 }

@@ -51,10 +51,10 @@ export function DayDetailModalScreen({
   const handleEditEvent = useCallback(
     (eventId: string) => {
       router.push(
-        `/calendar/events/${eventId}/edit?returnTo=${encodedCurrentPath}`,
+        `/calendar/days/${dateKey}/events/${eventId}?returnTo=${encodedCurrentPath}`,
       );
     },
-    [router, encodedCurrentPath],
+    [router, dateKey, encodedCurrentPath],
   );
 
   if (!date) {
