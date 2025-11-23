@@ -58,7 +58,7 @@ export function EventEditForm({ event, returnTo }: EventEditFormProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <header className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
+      <header className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3 bg-[var(--color-brand)]">
         <button
           type="button"
           onClick={handleBack}

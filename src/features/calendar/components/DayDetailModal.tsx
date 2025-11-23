@@ -37,48 +37,20 @@ export function DayDetailModal({
     }
   }, [events, selectedEventId]);
 
-  const selectedEvent =
-    events.find((event) => event.id === selectedEventId) ?? null;
-
   const handleClose = () => {
     setSelectedEventId(null);
     onClose();
   };
 
   return (
-    <NativeModal
-      isOpen={isOpen}
-      onClose={handleClose}
-      placement="bottom"
-      contentClassName="max-h-full overflow-y-auto"
-    >
-      <div className="mb-4 flex items-center justify-between">
+    <NativeModal isOpen={isOpen} contentClassName="max-h-full overflow-y-auto">
+      <div className="-mx-4 -mt-4 mb-4 flex items-center justify-between bg-[var(--color-brand)] px-4 py-3">
         <div>
           <h2 className="text-xl font-semibold text-[var(--color-text-default)]">
             {formatDisplayDate(date)}
           </h2>
         </div>
         <div className="flex items-center gap-2">
-          {!selectedEvent && (
-            <button
-              type="button"
-              onClick={onAddEvent}
-              className="rounded-full bg-[var(--color-brand)] p-2 text-[var(--color-brand-contrast)] shadow hover:bg-[var(--color-brand-hover)]"
-              aria-label="予定を追加"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                className="size-5"
-                aria-hidden="true"
-              >
-                <path d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-          )}
           <button
             type="button"
             onClick={handleClose}
@@ -114,6 +86,32 @@ export function DayDetailModal({
           ))}
         </div>
       )}
+      {
+        <div className="absolute bottom-8 right-4">
+          <button
+            type="button"
+            onClick={onAddEvent}
+            className="z-[var(--z-index-popover)] flex size-14 items-center justify-center rounded-full bg-[var(--color-brand)] text-[var(--color-brand-contrast)] shadow-lg transition-colors hover:bg-[var(--color-brand-hover)]"
+            aria-label="新規作成"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="size-6"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+          </button>
+        </div>
+      }
     </NativeModal>
   );
 }

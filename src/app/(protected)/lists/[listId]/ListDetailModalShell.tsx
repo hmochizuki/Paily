@@ -31,20 +31,15 @@ export function ListDetailModalShell({
   }, []);
 
   return (
-    <NativeModal
-      isOpen={isOpen}
-      onClose={handleClose}
-      placement="bottom"
-      contentClassName="max-h-full overflow-y-auto"
-    >
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">
+    <NativeModal isOpen={isOpen} contentClassName="max-h-full overflow-y-auto">
+      <div className="-mx-4 -mt-4 mb-4 flex items-center justify-between bg-[var(--color-brand)] px-4 py-3">
+        <p className="text-xs uppercase tracking-wide text-[var(--color-brand-contrast)]">
           {listTitle}
         </p>
         <button
           type="button"
           onClick={handleClose}
-          className="rounded-full p-2 text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)]"
+          className="rounded-full p-2 text-[var(--color-brand-contrast)] hover:bg-[var(--color-brand-hover)]"
           aria-label="閉じる"
         >
           <svg

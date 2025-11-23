@@ -59,11 +59,7 @@ export function NativePush({
 
   if (!isMounted) return null;
 
-  const overlayAnimation = `transition-opacity duration-300 ease-out ${
-    isVisible ? "opacity-40" : "opacity-0"
-  }`;
-
-  const containerAnimation = `transition-transform duration-[${PUSH_TRANSITION_DURATION}ms] ease-out ${
+  const containerAnimation = `transition-transform duration-300 ease-out ${
     isVisible ? "translate-x-0" : "translate-x-full"
   }`;
 
@@ -80,7 +76,7 @@ export function NativePush({
   return (
     <div
       role="presentation"
-      className={`fixed inset-0 z-[var(--z-index-modal-backdrop)] flex bg-black/50 backdrop-blur-sm ${overlayAnimation}`}
+      className="fixed inset-0 z-[var(--z-index-modal-backdrop)] flex"
     >
       {closeOnOverlayClick && (
         <button
@@ -95,7 +91,7 @@ export function NativePush({
       <div
         role="dialog"
         aria-modal="true"
-        className={`relative z-10 h-full w-full bg-white shadow-xl will-change-transform ${containerAnimation} ${contentClassName}`}
+        className={`relative z-[var(--z-index-modal)] h-full w-full bg-white shadow-xl will-change-transform ${containerAnimation} ${contentClassName}`}
       >
         {children}
       </div>
