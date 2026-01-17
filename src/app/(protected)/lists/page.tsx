@@ -9,6 +9,8 @@ export const metadata = {
   title: "共有リスト",
 };
 
+export const revalidate = 60;
+
 export default function ListsPage() {
   return (
     <div className="space-y-6 px-4 pt-4 pb-24">

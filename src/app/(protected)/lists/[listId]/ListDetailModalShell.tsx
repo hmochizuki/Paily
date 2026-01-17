@@ -22,7 +22,7 @@ export function ListDetailModalShell({
   const handleClose = useCallback(() => {
     setIsOpen(false);
     window.setTimeout(() => {
-      router.push("/lists");
+      router.back();
     }, MODAL_ANIMATION_DURATION_MS);
   }, [router]);
 

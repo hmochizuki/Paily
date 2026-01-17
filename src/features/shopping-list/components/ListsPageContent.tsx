@@ -38,6 +38,11 @@ export function ListsPageContent({
     }
   }, [isLoading, userSpaceIds, selectedSpaceId, selectSpace]);
 
+  const lists = useMemo(
+    () => allLists.filter((list) => list.coupleId === currentSpaceId),
+    [allLists, currentSpaceId],
+  );
+
   if (isLoading || !currentSpaceId) {
     return (
       <div className="space-y-6">
@@ -48,8 +53,6 @@ export function ListsPageContent({
       </div>
     );
   }
-
-  const lists = allLists.filter((list) => list.coupleId === currentSpaceId);
 
   return (
     <>
