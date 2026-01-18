@@ -24,6 +24,7 @@ model Profile {
   shoppingListItems  ShoppingListItem[]      @relation("ItemAddedBy")
   shoppingItemStates ShoppingListItemState[] @relation("ItemStateCheckedBy")
   calendarEvents     CalendarEvent[]         @relation("EventCreatedBy")
+  notes              Note[]
 
   @@map("profiles")
 }
@@ -148,4 +149,33 @@ model CalendarEvent {
 
   @@index([coupleId, startAt])
   @@map("calendar_events")
+}
+
+model Note {
+  id        String   @id @db.Uuid
+  profileId String   @map("profile_id") @db.Uuid
+  title     String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  sheets  Sheet[]
+
+  @@index([profileId])
+  @@map("notes")
+}
+
+model Sheet {
+  id        String   @id @db.Uuid
+  noteId    String   @map("note_id") @db.Uuid
+  title     String
+  content   String   @db.Text
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@index([noteId])
+  @@map("sheets")
 }
