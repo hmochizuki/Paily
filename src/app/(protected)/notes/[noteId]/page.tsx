@@ -36,8 +36,8 @@ export default async function NoteDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-default)] bg-white">
+    <div className="min-h-screen">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-default)] bg-white sticky top-16 z-10">
         <div className="flex items-center gap-3">
           <Link
             href="/notes"
@@ -62,9 +62,7 @@ export default async function NoteDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
-        <NoteDetailContent note={note} />
-      </div>
+      <NoteDetailContent note={note} />
     </div>
   );
 }

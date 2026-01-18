@@ -53,7 +53,7 @@ export function CreateNoteButton() {
       </button>
 
       {showDialog && (
-        <div className="fixed inset-0 z-[var(--z-index-modal-backdrop)] bg-black bg-opacity-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[var(--z-index-modal-backdrop)] bg-black/50 flex items-center justify-center px-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md z-[var(--z-index-modal)]">
             <h2 className="text-lg font-semibold mb-4">新しいノートを作成</h2>
             <form onSubmit={handleCreate}>

@@ -44,13 +44,13 @@ export function SheetEditor({ sheet }: Props) {
   const hasChanges = title !== sheet.title || content !== sheet.content;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col min-h-[calc(100vh-200px)]">
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-default)]">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="text-base font-medium bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] rounded px-2 py-1 -ml-2"
+          className="text-base font-medium bg-transparent focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)] rounded px-2 py-1 -ml-2 flex-1"
           placeholder="シートのタイトル"
         />
         <button
@@ -67,7 +67,7 @@ export function SheetEditor({ sheet }: Props) {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full h-full resize-none focus:outline-none text-sm leading-relaxed"
+          className="w-full min-h-[400px] resize-none focus:outline-none text-sm leading-relaxed"
           placeholder="ここに内容を入力..."
         />
       </div>

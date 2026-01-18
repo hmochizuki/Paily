@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getNotesData } from "@/server/services/noteService";
 import { CreateNoteButton } from "@/features/notes/components/CreateNoteButton";
-import { formatDate } from "@/utils/dateHelpers";
+import { DeleteNoteButton } from "@/features/notes/components/DeleteNoteButton";
 
 export const metadata = {
   title: "ノート",
@@ -25,21 +25,31 @@ export default async function NotesPage() {
       ) : (
         <div className="space-y-3">
           {notes.map((note) => (
-            <Link
+            <div
               key={note.id}
-              href={`/notes/${note.id}`}
-              className="block rounded-lg border border-[var(--color-border-default)] bg-white p-4 transition-colors hover:bg-[var(--color-background-muted)]"
+              className="relative rounded-lg border border-[var(--color-border-default)] bg-white transition-colors hover:bg-[var(--color-bg-subtle)]"
             >
-              <div className="space-y-2">
-                <h3 className="text-base font-medium text-[var(--color-text-default)]">
-                  {note.title}
-                </h3>
-                <div className="flex items-center gap-4 text-sm text-[var(--color-text-muted)]">
-                  <span>{note.sheets.length} シート</span>
-                  <span>{formatDate(note.createdAt)}</span>
+              <Link href={`/notes/${note.id}`} className="block p-4" prefetch={true}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-base font-medium text-[var(--color-text-default)]">
+                      {note.title}
+                    </h2>
+                    <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                      {note.sheets.length} シート
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      {new Date(note.updatedAt).toLocaleDateString("ja-JP")}
+                    </p>
+                  </div>
                 </div>
+              </Link>
+              <div className="absolute right-2 top-2">
+                <DeleteNoteButton noteId={note.id} noteTitle={note.title} />
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

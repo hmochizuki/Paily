@@ -126,10 +126,11 @@ export default function BottomNavigation() {
           <Link
             key={item.label}
             href={item.href}
-            className={`flex flex-col items-center justify-center py-2 transition-colors ${
+            prefetch={true}
+            className={`flex flex-col items-center justify-center py-2 transition-all duration-150 ${
               isActive(item.href)
-                ? "text-[var(--color-brand-hover)]"
-                : "text-gray-600"
+                ? "text-[var(--color-brand-hover)] scale-105"
+                : "text-gray-600 hover:scale-105"
             }`}
           >
             {item.icon}
