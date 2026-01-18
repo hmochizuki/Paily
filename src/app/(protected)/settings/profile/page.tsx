@@ -13,6 +13,8 @@ export const metadata = {
   title: "プロフィール設定",
 };
 
+export const revalidate = 60;
+
 export default function ProfileSettingsPage() {
   return (
     <div className="space-y-6 px-4 pt-4 pb-24">

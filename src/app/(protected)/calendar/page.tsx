@@ -1,37 +1,33 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { CalendarPageContent } from "@/features/calendar/components/CalendarPageContent";
 import { requireUser } from "@/lib/auth";
 import { getCalendarData } from "@/server/services/calendarService";
-import { CalendarPageSkeleton } from "./_components/CalendarPageSkeleton";
 
 export const metadata = {
   title: "カレンダー",
 };
 
-export default function CalendarPage() {
-  return (
-    <div className="flex h-full flex-1 flex-col px-4 pb-4 pt-2">
-      <Suspense fallback={<CalendarPageSkeleton />}>
-        <CalendarDataSection />
-      </Suspense>
-    </div>
-  );
-}
+export const revalidate = 60;
 
-async function CalendarDataSection() {
+export default async function CalendarPage() {
   const user = await requireUser();
   const cached = await getCalendarData(user.id);
 
   if (cached.userSpaceIds.length === 0) {
-    return <NoSpaceMessage />;
+    return (
+      <div className="flex h-full flex-1 flex-col px-4 pb-4 pt-2">
+        <NoSpaceMessage />
+      </div>
+    );
   }
 
   return (
-    <CalendarPageContent
-      allEventsDto={cached.events}
-      userSpaceIds={cached.userSpaceIds}
-    />
+    <div className="flex h-full flex-1 flex-col px-4 pb-4 pt-2">
+      <CalendarPageContent
+        allEventsDto={cached.events}
+        userSpaceIds={cached.userSpaceIds}
+      />
+    </div>
   );
 }
 

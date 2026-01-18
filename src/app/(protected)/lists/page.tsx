@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { ListsPageContent } from "@/features/shopping-list/components/ListsPageContent";
 import { requireUser } from "@/lib/auth";
 import { getListsData } from "@/server/services/listService";
-import { ListsPageSkeleton } from "./_components/ListsPageSkeleton";
 
 export const metadata = {
   title: "共有リスト",
@@ -11,7 +9,10 @@ export const metadata = {
 
 export const revalidate = 60;
 
-export default function ListsPage() {
+export default async function ListsPage() {
+  const user = await requireUser();
+  const cached = await getListsData(user.id);
+
   return (
     <div className="space-y-6 px-4 pt-4 pb-24">
       <div className="space-y-2">
@@ -20,26 +21,15 @@ export default function ListsPage() {
         </h1>
       </div>
 
-      <Suspense fallback={<ListsPageSkeleton />}>
-        <ListsDataSection />
-      </Suspense>
+      {cached.userSpaceIds.length === 0 ? (
+        <NoSpaceMessage />
+      ) : (
+        <ListsPageContent
+          allListsDto={cached.lists}
+          userSpaceIds={cached.userSpaceIds}
+        />
+      )}
     </div>
-  );
-}
-
-async function ListsDataSection() {
-  const user = await requireUser();
-  const cached = await getListsData(user.id);
-
-  if (cached.userSpaceIds.length === 0) {
-    return <NoSpaceMessage />;
-  }
-
-  return (
-    <ListsPageContent
-      allListsDto={cached.lists}
-      userSpaceIds={cached.userSpaceIds}
-    />
   );
 }
 
