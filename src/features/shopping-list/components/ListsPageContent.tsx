@@ -67,7 +67,11 @@ export function ListsPageContent({
               key={list.id}
               className="relative rounded-lg border border-[var(--color-border-default)] bg-white transition-colors hover:bg-[var(--color-bg-subtle)]"
             >
-              <Link href={`/lists/${list.id}`} className="block p-4" prefetch={true}>
+              <Link
+                href={`/lists/${list.id}`}
+                className="block p-4"
+                prefetch={true}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-base font-medium text-[var(--color-text-default)]">

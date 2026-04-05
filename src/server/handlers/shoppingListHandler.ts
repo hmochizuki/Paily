@@ -48,6 +48,7 @@ export async function addItemAction(formData: FormData) {
   const coupleId = formData.get("coupleId");
   const name = formData.get("name");
   const rawLabel = formData.get("label");
+  const rawCategory = formData.get("category");
 
   if (typeof listId !== "string" || typeof coupleId !== "string") {
     throw new Error("無効なパラメータです");
@@ -66,12 +67,18 @@ export async function addItemAction(formData: FormData) {
     throw new Error("ラベルは10文字以内で入力してください");
   }
 
+  const category =
+    typeof rawCategory === "string" && rawCategory.trim() !== ""
+      ? rawCategory.trim()
+      : null;
+
   await addShoppingListItem({
     userId: user.id,
     coupleId,
     listId,
     name: name.trim(),
     label,
+    category,
   });
 
   revalidatePath(`/lists/${listId}`);

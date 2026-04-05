@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { SuggestionInput } from "@/common/ui/form/SuggestionInput";
+import { SHOPPING_CATEGORIES } from "@/features/shopping-list/constants";
 import { addItemAction } from "@/server/handlers/shoppingListHandler";
 
 type AddItemSubmitHandler = (formData: FormData) => Promise<void>;
@@ -21,6 +22,7 @@ export function AddItemForm({
 }: AddItemFormProps) {
   const [name, setName] = useState("");
   const [label, setLabel] = useState("");
+  const [category, setCategory] = useState("");
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const submitHandler = onSubmit ?? addItemAction;
@@ -30,6 +32,7 @@ export function AddItemForm({
       await submitHandler(formData);
       setName("");
       setLabel("");
+      setCategory("");
       formRef.current?.reset();
     });
   };
@@ -47,6 +50,20 @@ export function AddItemForm({
         className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
         disabled={isPending}
       />
+      <select
+        name="category"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="w-full rounded-lg border border-[var(--color-border-default)] px-3 py-2 text-sm focus:border-[var(--color-brand)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand)]"
+        disabled={isPending}
+      >
+        <option value="">カテゴリ（任意）</option>
+        {SHOPPING_CATEGORIES.map((cat) => (
+          <option key={cat.value} value={cat.value}>
+            {cat.label}
+          </option>
+        ))}
+      </select>
       <div className="flex gap-2">
         <SuggestionInput
           name="label"

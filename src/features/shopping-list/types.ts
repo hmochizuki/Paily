@@ -1,9 +1,10 @@
 import type { ReplaceDateWithString } from "@/types/replace-date-with-string";
 
-interface ShoppingListItemCore {
+type ShoppingListItemCore = {
   id: string;
   name: string;
   label: string | null;
+  category: string | null;
   note: string | null;
   quantity: string | null;
   createdAt: Date;
@@ -14,7 +15,7 @@ interface ShoppingListItemCore {
     isChecked: boolean;
     checkedAt: Date | null;
   } | null;
-}
+};
 
 export type ShoppingListItemDto = ReplaceDateWithString<ShoppingListItemCore>;
 
@@ -47,14 +48,14 @@ export function toShoppingListItemViewModels(
   return dtos.map((dto) => toShoppingListItemViewModel(dto));
 }
 
-interface ListOverviewCore {
+type ListOverviewCore = {
   id: string;
   title: string;
   coupleId: string;
   isActive: boolean;
   updatedAt: Date;
   uncheckedItemCount: number;
-}
+};
 
 export type ListOverviewDto = ReplaceDateWithString<ListOverviewCore>;
 type ListOverviewViewModel = ListOverviewCore;

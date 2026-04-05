@@ -10,6 +10,10 @@ import {
   useState,
 } from "react";
 import {
+  getCategoryLabel,
+  SHOPPING_CATEGORIES,
+} from "@/features/shopping-list/constants";
+import {
   addItemAction,
   deleteItemAction,
   toggleItemCheckAction,
@@ -85,6 +89,7 @@ export function ShoppingListDetailClient({
   >(initialViewModels, optimisticReducer);
   const serverSnapshotRef = useRef(initialViewModels);
   const [labelSuggestions, setLabelSuggestions] = useState(recentLabels);
+  const [groupByCategory, setGroupByCategory] = useState(false);
 
   useEffect(() => {
     serverSnapshotRef.current = initialViewModels;
@@ -104,10 +109,12 @@ export function ShoppingListDetailClient({
   const createOptimisticItem = (params: {
     name: string;
     label: string | null;
+    category: string | null;
   }): ShoppingListItemViewModel => ({
     id: `temp-${crypto.randomUUID()}`,
     name: params.name,
     label: params.label,
+    category: params.category,
     note: null,
     quantity: null,
     createdAt: new Date(),
@@ -124,6 +131,7 @@ export function ShoppingListDetailClient({
   const handleAddItem = async (formData: FormData) => {
     const name = formData.get("name");
     const rawLabel = formData.get("label");
+    const rawCategory = formData.get("category");
     if (typeof name !== "string" || name.trim() === "") {
       return;
     }
@@ -137,9 +145,15 @@ export function ShoppingListDetailClient({
       return;
     }
 
+    const category =
+      typeof rawCategory === "string" && rawCategory.trim() !== ""
+        ? rawCategory.trim()
+        : null;
+
     const optimisticItem = createOptimisticItem({
       name: name.trim(),
       label,
+      category,
     });
     dispatchOptimistic({ type: "add", item: optimisticItem });
 
@@ -203,6 +217,45 @@ export function ShoppingListDetailClient({
       return bTime - aTime;
     });
 
+  const groupedUncheckedItems = useMemo(() => {
+    if (!groupByCategory) {
+      return null;
+    }
+    const categoryOrder: string[] = SHOPPING_CATEGORIES.map((c) => c.value);
+    const groups = new Map<string, ShoppingListItemViewModel[]>();
+
+    for (const item of uncheckedItems) {
+      const key = item.category ?? "__uncategorized__";
+      const existing = groups.get(key);
+      if (existing) {
+        existing.push(item);
+      } else {
+        groups.set(key, [item]);
+      }
+    }
+
+    const sorted = [...groups.entries()].sort(([a], [b]) => {
+      const aIdx =
+        a === "__uncategorized__"
+          ? categoryOrder.length
+          : categoryOrder.indexOf(a);
+      const bIdx =
+        b === "__uncategorized__"
+          ? categoryOrder.length
+          : categoryOrder.indexOf(b);
+      return (
+        (aIdx === -1 ? categoryOrder.length : aIdx) -
+        (bIdx === -1 ? categoryOrder.length : bIdx)
+      );
+    });
+
+    return sorted.map(([key, items]) => ({
+      key,
+      label: key === "__uncategorized__" ? "未分類" : getCategoryLabel(key),
+      items,
+    }));
+  }, [groupByCategory, uncheckedItems]);
+
   return (
     <>
       <AddItemForm
@@ -220,19 +273,52 @@ export function ShoppingListDetailClient({
         <div className="space-y-4">
           {uncheckedItems.length > 0 && (
             <div className="space-y-2">
-              <h2 className="text-sm font-medium text-[var(--color-text-muted)]">
-                未完了 ({uncheckedItems.length})
-              </h2>
-              <div className="space-y-1">
-                {uncheckedItems.map((item) => (
-                  <ShoppingListItemRow
-                    key={item.id}
-                    item={item}
-                    onToggle={handleToggleItem}
-                    onDelete={handleDeleteItem}
-                  />
-                ))}
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-medium text-[var(--color-text-muted)]">
+                  未完了 ({uncheckedItems.length})
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setGroupByCategory((prev) => !prev)}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+                    groupByCategory
+                      ? "bg-[var(--color-brand)] text-[var(--color-brand-contrast)]"
+                      : "border border-[var(--color-border-default)] bg-white text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)]"
+                  }`}
+                >
+                  カテゴリ別表示
+                </button>
               </div>
+              {groupByCategory && groupedUncheckedItems ? (
+                <div className="space-y-3">
+                  {groupedUncheckedItems.map((group) => (
+                    <div key={group.key} className="space-y-1">
+                      <h3 className="text-xs font-semibold text-[var(--color-text-muted)]">
+                        {group.label} ({group.items.length})
+                      </h3>
+                      {group.items.map((item) => (
+                        <ShoppingListItemRow
+                          key={item.id}
+                          item={item}
+                          onToggle={handleToggleItem}
+                          onDelete={handleDeleteItem}
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {uncheckedItems.map((item) => (
+                    <ShoppingListItemRow
+                      key={item.id}
+                      item={item}
+                      onToggle={handleToggleItem}
+                      onDelete={handleDeleteItem}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

@@ -53,6 +53,7 @@ export async function addShoppingListItem(params: {
   coupleId: string;
   name: string;
   label: string | null;
+  category: string | null;
 }) {
   await assertMembership(params.userId, params.coupleId);
   const itemId = crypto.randomUUID();
@@ -66,6 +67,7 @@ export async function addShoppingListItem(params: {
         addedById: params.userId,
         name: params.name,
         label: params.label ?? undefined,
+        category: params.category ?? undefined,
       },
       tx,
     );

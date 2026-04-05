@@ -94,6 +94,7 @@ async function fetchListDetailData(
     id: item.id,
     name: item.name,
     label: item.label,
+    category: item.category,
     note: item.note,
     quantity: item.quantity,
     createdAt: item.createdAt.toISOString(),
