@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { getCategoryLabel } from "@/features/shopping-list/constants";
 import type { ShoppingListItemViewModel } from "../types";
 
 interface ShoppingListItemRowProps {
@@ -75,11 +76,18 @@ export function ShoppingListItemRow({
               </span>
             )}
           </p>
-          {item.label && (
-            <span className="inline-flex items-center rounded-full border border-[var(--color-brand)] bg-[var(--color-brand)] px-2 py-0 text-xs font-semibold text-[var(--color-brand-contrast)] shadow-sm">
-              {item.label}
-            </span>
-          )}
+          <div className="flex gap-1">
+            {item.category && (
+              <span className="inline-flex items-center rounded-full border border-[var(--color-success)] bg-[var(--color-success)] px-2 py-0 text-xs font-semibold text-white shadow-sm">
+                {getCategoryLabel(item.category)}
+              </span>
+            )}
+            {item.label && (
+              <span className="inline-flex items-center rounded-full border border-[var(--color-brand)] bg-[var(--color-brand)] px-2 py-0 text-xs font-semibold text-[var(--color-brand-contrast)] shadow-sm">
+                {item.label}
+              </span>
+            )}
+          </div>
         </div>
         <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">
           {isChecked && item.state?.checkedAt
