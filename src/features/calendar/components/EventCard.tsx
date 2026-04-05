@@ -2,10 +2,11 @@
 
 import type { CalendarEventViewModel } from "../types";
 
-interface EventCardProps {
+type EventCardProps = {
   event: CalendarEventViewModel;
   onClick: () => void;
-}
+  partnerColor?: string;
+};
 
 const COLOR_CLASSES: Record<string, string> = {
   pink: "bg-pink-400",
@@ -17,7 +18,7 @@ const COLOR_CLASSES: Record<string, string> = {
   purple: "bg-purple-400",
 };
 
-export function EventCard({ event, onClick }: EventCardProps) {
+export function EventCard({ event, onClick, partnerColor }: EventCardProps) {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("ja-JP", {
       hour: "2-digit",
@@ -40,16 +41,28 @@ export function EventCard({ event, onClick }: EventCardProps) {
           {event.title}
         </h4>
       </div>
-      <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-        {event.isAllDay ? (
-          "終日"
-        ) : (
-          <>
-            {formatTime(event.startAt)}
-            {event.endAt && ` - ${formatTime(event.endAt)}`}
-          </>
-        )}
-      </p>
+      <div className="mt-1 flex items-center gap-2">
+        <p className="text-xs text-[var(--color-text-muted)]">
+          {event.isAllDay ? (
+            "終日"
+          ) : (
+            <>
+              {formatTime(event.startAt)}
+              {event.endAt && ` - ${formatTime(event.endAt)}`}
+            </>
+          )}
+        </p>
+        <div className="flex items-center gap-1">
+          {partnerColor && (
+            <span
+              className={`inline-block size-2 rounded-full ${partnerColor}`}
+            />
+          )}
+          <span className="text-[10px] text-[var(--color-text-muted)]">
+            by {event.createdByDisplayName}
+          </span>
+        </div>
+      </div>
       {event.description && (
         <p className="mt-2 line-clamp-2 text-sm text-[var(--color-text-muted)]">
           {event.description}

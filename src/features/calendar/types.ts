@@ -1,6 +1,6 @@
 import type { ReplaceDateWithString } from "@/types/replace-date-with-string";
 
-interface CalendarEventCore {
+type CalendarEventCore = {
   id: string;
   coupleId: string;
   title: string;
@@ -12,7 +12,8 @@ interface CalendarEventCore {
   createdBy: {
     displayName: string;
   };
-}
+  createdByDisplayName: string;
+};
 
 export type CalendarEventDto = ReplaceDateWithString<CalendarEventCore>;
 

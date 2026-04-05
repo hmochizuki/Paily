@@ -46,6 +46,7 @@ function buildCalendarEventDto(event: EventRecord): CalendarEventDto {
     createdBy: {
       displayName: event.createdBy?.displayName ?? "メンバー",
     },
+    createdByDisplayName: event.createdBy?.displayName ?? "メンバー",
   };
 }
 
