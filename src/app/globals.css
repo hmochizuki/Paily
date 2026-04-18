@@ -43,8 +43,12 @@
 }
 
 /* 既存変数を参照するエイリアス（next/font の variable を割り当て） */
+/* 日本語は M PLUS Rounded 1c（角丸ゴシック）を主に据える。
+   英字・数字は Geist を優先し、日本語グリフのみ後段のスタックに落ちる。 */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans:
+    var(--font-geist-sans), var(--font-japanese), "Hiragino Sans", "Yu Gothic",
+    Meiryo, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
